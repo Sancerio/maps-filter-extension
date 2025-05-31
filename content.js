@@ -374,10 +374,12 @@ function waitForListToLoad() {
       injectFilterUI();
       observeListChanges(listContainer);
       
-      // Start auto-scroll
-      autoScrollListToLoadAll(() => {
-        filterPlaces(lastQuery, lastExcludeQuery);
-      });
+      // Only start auto-scroll if we're not on the lists overview page
+      if (!isListOverviewPage() && hasPlaceContent(listContainer)) {
+        autoScrollListToLoadAll(() => {
+          filterPlaces(lastQuery, lastExcludeQuery);
+        });
+      }
       
       // Also monitor for URL changes (list navigation)
       monitorUrlChanges();
@@ -400,11 +402,15 @@ function monitorUrlChanges() {
       // Small delay to let the new content load
       setTimeout(() => {
         const listContainer = document.querySelector('div[role="main"]');
-        if (listContainer) {
-          // Re-run auto-scroll for the new list
+        
+        // Only auto-scroll if we're viewing actual list contents (not overview)
+        if (listContainer && !isListOverviewPage() && hasPlaceContent(listContainer)) {
+          console.log('List content detected, starting auto-scroll...');
           autoScrollListToLoadAll(() => {
             filterPlaces(lastQuery, lastExcludeQuery);
           }, 20, true); // isReload = true
+        } else {
+          console.log('Lists overview page detected, skipping auto-scroll');
         }
       }, 500);
     }
@@ -461,6 +467,69 @@ function showSuccessMessage(isReload = false) {
     // Add success class for styling
     loadingIndicator.classList.add('success');
   }
+}
+
+// Helper function to detect if we're on the lists overview page vs. inside a specific list
+function isListOverviewPage() {
+  // Check for list overview indicators
+  const listOverviewIndicators = [
+    // Text that appears on overview page
+    'Lists you saved',
+    'Starred places', 
+    'Favorites',
+    // List metadata patterns (e.g., "Private • 3 places")
+    'Private •',
+    '• 0 places',
+    '• 1 place',
+    '• 2 places',
+    '• 3 places',
+    '• 4 places',
+    '• 5 places'
+  ];
+  
+  // Check if page contains overview elements
+  const pageText = document.body.textContent.toLowerCase();
+  const hasOverviewText = listOverviewIndicators.some(indicator => 
+    pageText.includes(indicator.toLowerCase())
+  );
+  
+  // Check for list cards (elements that link to lists rather than places)
+  const listCards = document.querySelectorAll('[role="main"] [role="button"], [role="main"] a');
+  const hasListCards = Array.from(listCards).some(card => {
+    const cardText = card.textContent;
+    return cardText.includes('places') || cardText.includes('Private •') || cardText.includes('By ');
+  });
+  
+  // Check URL patterns that indicate overview
+  const url = window.location.href;
+  const urlIndicatesOverview = url.includes('/lists') && !url.includes('/list/');
+  
+  // We're on overview if we have overview indicators OR list cards OR URL indicates overview
+  return hasOverviewText || hasListCards || urlIndicatesOverview;
+}
+
+// Helper function to detect if we have actual place content (not just list overview)
+function hasPlaceContent(listContainer) {
+  if (!listContainer) return false;
+  
+  const allButtons = Array.from(listContainer.querySelectorAll('button'));
+  const placeButtons = allButtons.filter(button => {
+    const hasImage = button.querySelector('img');
+    const hasHeadline = button.querySelector('h1, h2, h3, h4, .fontHeadlineSmall');
+    const hasMultipleDivsOrSpans = button.querySelectorAll('div, span').length > 2;
+    
+    // Additional check: avoid list overview cards
+    const buttonText = button.textContent.toLowerCase();
+    const isListCard = buttonText.includes('private •') || 
+                      buttonText.includes('places') || 
+                      buttonText.includes('by ') ||
+                      buttonText.match(/\d+ place/);
+    
+    return !isListCard && ((hasImage && hasHeadline) || (hasHeadline && hasMultipleDivsOrSpans) || (hasImage && hasMultipleDivsOrSpans));
+  });
+  
+  // We have place content if there are actual place buttons (not just list cards)
+  return placeButtons.length > 0;
 }
 
 // Only run waitForListToLoad if not in a test environment

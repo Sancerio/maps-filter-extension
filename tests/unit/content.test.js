@@ -638,4 +638,73 @@ describe('Content Script Unit Tests', () => {
       expect(loadingText.textContent).toBe('Custom loading message');
     });
   });
+
+  describe('list overview detection', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div role="main"></div>';
+    });
+
+    test('should detect lists overview page by text content', () => {
+      document.body.innerHTML = `
+        <div role="main">
+          <div>Lists you saved</div>
+          <div>Starred places</div>
+          <div>Private • 3 places</div>
+        </div>
+      `;
+      
+      expect(window.isListOverviewPage()).toBe(true);
+    });
+
+    test('should detect list cards with metadata', () => {
+      document.body.innerHTML = `
+        <div role="main">
+          <button>Coffee & Eat in Bali<br>By Mikhael Andarias • 134 places</button>
+          <button>Travel plans<br>Private • 0 places</button>
+        </div>
+      `;
+      
+      expect(window.isListOverviewPage()).toBe(true);
+    });
+
+    test('should not detect overview when viewing actual place content', () => {
+      const listContainer = document.querySelector('div[role="main"]');
+      
+      // Add actual place buttons (not list cards)
+      const placeButton = document.createElement('button');
+      placeButton.innerHTML = '<img src="test.jpg"><h3 class="fontHeadlineSmall">Cafe Central</h3><span>Coffee Shop</span>';
+      listContainer.appendChild(placeButton);
+      
+      expect(window.isListOverviewPage()).toBe(false);
+      expect(window.hasPlaceContent(listContainer)).toBe(true);
+    });
+
+    test('should detect when there is no place content', () => {
+      const listContainer = document.querySelector('div[role="main"]');
+      
+      // Add list cards (not actual places)
+      const listCard = document.createElement('button');
+      listCard.textContent = 'My Travel List\nPrivate • 5 places';
+      listContainer.appendChild(listCard);
+      
+      expect(window.hasPlaceContent(listContainer)).toBe(false);
+    });
+
+    test('should distinguish between place buttons and list cards', () => {
+      const listContainer = document.querySelector('div[role="main"]');
+      
+      // Add a list card
+      const listCard = document.createElement('button');
+      listCard.textContent = 'Restaurant List\nBy John Doe • 15 places';
+      listContainer.appendChild(listCard);
+      
+      // Add an actual place button
+      const placeButton = document.createElement('button');
+      placeButton.innerHTML = '<img src="test.jpg"><h3 class="fontHeadlineSmall">Pizza Palace</h3><span>Italian Restaurant</span>';
+      listContainer.appendChild(placeButton);
+      
+      // Should detect place content because there's at least one actual place
+      expect(window.hasPlaceContent(listContainer)).toBe(true);
+    });
+  });
 }); 
