@@ -19,7 +19,7 @@ if [ -d "$OUTPUT_DIR" ]; then
     rm -rf "$OUTPUT_DIR"
 fi
 
-mkdir -p "$OUTPUT_DIR"
+mkdir -p "$OUTPUT_DIR" "$OUTPUT_DIR/icons"
 
 echo "📋 Copying necessary files..."
 
@@ -28,13 +28,13 @@ cp manifest.json "$OUTPUT_DIR/"
 cp content.js "$OUTPUT_DIR/"
 cp style.css "$OUTPUT_DIR/"
 
-# Copy icon files (check if they exist)
+# Copy icon files from icons directory
 for icon in icon_16x16.png icon_48x48.png icon_128x128.png; do
-    if [ -f "$icon" ]; then
-        cp "$icon" "$OUTPUT_DIR/"
-        echo "✅ Copied $icon"
+    if [ -f "icons/$icon" ]; then
+        cp "icons/$icon" "$OUTPUT_DIR/icons/"
+        echo "✅ Copied icons/$icon"
     else
-        echo "⚠️  Warning: $icon not found - you may need to add this file"
+        echo "⚠️  Warning: icons/$icon not found - you may need to add this file"
     fi
 done
 

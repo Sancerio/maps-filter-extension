@@ -86,7 +86,12 @@ maps-filter-extension/
 ├── manifest.json       # Extension configuration
 ├── content.js          # Main functionality
 ├── style.css          # UI styling
-├── pack.sh            # Build script
+├── icons/             # Extension icons
+│   ├── icon_16x16.png
+│   ├── icon_48x48.png
+│   └── icon_128x128.png
+├── scripts/           # Build and utility scripts
+│   └── pack.sh        # Distribution packaging script
 ├── .gitignore         # Git ignore rules
 └── README.md          # This file
 ```
@@ -94,10 +99,10 @@ maps-filter-extension/
 ### Building for Distribution
 ```bash
 # Make sure the pack script is executable
-chmod +x pack.sh
+chmod +x scripts/pack.sh
 
 # Create a distribution package
-./pack.sh
+./scripts/pack.sh
 ```
 
 This creates a `google-maps-list-filter-v1.0.zip` file ready for store submission.
