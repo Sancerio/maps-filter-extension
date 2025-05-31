@@ -545,4 +545,48 @@ describe('Content Script Unit Tests', () => {
       expect(item3.style.display).toBe('none'); // Doesn't match include 'japanese'
     });
   });
+
+  describe('loading state functionality', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div role="main"></div>';
+      // Inject the filter UI so loading indicator exists
+      window.injectFilterUI();
+    });
+
+    test('should show loading indicator when showLoadingState is called', () => {
+      const loadingIndicator = document.getElementById('loading-indicator');
+      expect(loadingIndicator).not.toBeNull();
+      expect(loadingIndicator.style.display).toBe('none'); // Initially hidden
+
+      window.showLoadingState();
+      expect(loadingIndicator.style.display).toBe('flex');
+    });
+
+    test('should hide loading indicator when hideLoadingState is called', () => {
+      const loadingIndicator = document.getElementById('loading-indicator');
+      window.showLoadingState();
+      expect(loadingIndicator.style.display).toBe('flex');
+
+      window.hideLoadingState();
+      expect(loadingIndicator.style.display).toBe('none');
+    });
+
+    test('should update progress text when updateLoadingProgress is called', () => {
+      const listContainer = document.querySelector('div[role="main"]');
+      
+      // Add some mock buttons to simulate places
+      const mockButton1 = document.createElement('button');
+      mockButton1.innerHTML = '<img src="test.jpg"><h3 class="fontHeadlineSmall">Test Place 1</h3>';
+      listContainer.appendChild(mockButton1);
+      
+      const mockButton2 = document.createElement('button');
+      mockButton2.innerHTML = '<img src="test.jpg"><h3 class="fontHeadlineSmall">Test Place 2</h3>';
+      listContainer.appendChild(mockButton2);
+
+      window.updateLoadingProgress();
+
+      const loadingText = document.querySelector('#loading-indicator span');
+      expect(loadingText.textContent).toBe('Loading places... (2 found)');
+    });
+  });
 }); 

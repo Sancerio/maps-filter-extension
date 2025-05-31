@@ -53,7 +53,7 @@ describe('Google Maps List Filter E2E Tests', () => {
     
     // Check its placeholder
     const placeholder = await page.evaluate(el => el.placeholder, filterInput);
-    expect(placeholder).toBe('Filter places by name, type, price, or notes... (use -word to exclude)');
+    expect(placeholder).toBe('Filter places by name, type, price, or notes...');
   });
 
   test('should show all items when filter is empty', async () => {

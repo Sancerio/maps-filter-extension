@@ -25,6 +25,10 @@ function injectFilterUI() {
     <div class="filter-examples">
       Examples: "restaurant -expensive", "mala -✅"
     </div>
+    <div id="loading-indicator" class="loading-state" style="display: none;">
+      <div class="loading-spinner"></div>
+      <span>Loading all places...</span>
+    </div>
   `;
   document.body.appendChild(container);
 
@@ -228,12 +232,15 @@ function getScrollableListContainer() {
 }
 
 function autoScrollListToLoadAll(callback, maxTries = 20) {
+  showLoadingState(); // Show loading at start
   let tries = 0;
   function tryScroll() {
     const scrollable = getScrollableListContainer();
     if (!scrollable) {
       if (tries++ < maxTries) {
         setTimeout(tryScroll, 300);
+      } else {
+        hideLoadingState(); // Hide loading if we can't find scrollable container
       }
       return;
     }
@@ -241,6 +248,10 @@ function autoScrollListToLoadAll(callback, maxTries = 20) {
     let sameCount = 0;
     function scrollStep() {
       scrollable.scrollTop = scrollable.scrollHeight;
+      
+      // Update progress indicator
+      updateLoadingProgress();
+      
       setTimeout(() => {
         if (scrollable.scrollHeight !== lastScrollHeight) {
           lastScrollHeight = scrollable.scrollHeight;
@@ -250,6 +261,7 @@ function autoScrollListToLoadAll(callback, maxTries = 20) {
           sameCount++;
           scrollStep();
         } else {
+          hideLoadingState(); // Hide loading when scrolling is complete
           if (callback) callback();
         }
       }, 500);
@@ -257,6 +269,26 @@ function autoScrollListToLoadAll(callback, maxTries = 20) {
     scrollStep();
   }
   tryScroll();
+}
+
+function updateLoadingProgress() {
+  const listContainer = document.querySelector('div[role="main"]');
+  const loadingIndicator = document.getElementById('loading-indicator');
+  
+  if (listContainer && loadingIndicator) {
+    const allButtons = Array.from(listContainer.querySelectorAll('button'));
+    const placeButtons = allButtons.filter(button => {
+      const hasImage = button.querySelector('img');
+      const hasHeadline = button.querySelector('h1, h2, h3, h4, .fontHeadlineSmall');
+      const hasMultipleDivsOrSpans = button.querySelectorAll('div, span').length > 2;
+      return (hasImage && hasHeadline) || (hasHeadline && hasMultipleDivsOrSpans) || (hasImage && hasMultipleDivsOrSpans);
+    });
+    
+    const loadingText = loadingIndicator.querySelector('span');
+    if (loadingText) {
+      loadingText.textContent = `Loading places... (${placeButtons.length} found)`;
+    }
+  }
 }
 
 function waitForListToLoad() {
@@ -271,6 +303,20 @@ function waitForListToLoad() {
       });
     }
   }, 1000);
+}
+
+function showLoadingState() {
+  const loadingIndicator = document.getElementById('loading-indicator');
+  if (loadingIndicator) {
+    loadingIndicator.style.display = 'flex';
+  }
+}
+
+function hideLoadingState() {
+  const loadingIndicator = document.getElementById('loading-indicator');
+  if (loadingIndicator) {
+    loadingIndicator.style.display = 'none';
+  }
 }
 
 // Only run waitForListToLoad if not in a test environment
