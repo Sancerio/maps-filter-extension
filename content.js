@@ -1,4 +1,5 @@
 let lastQuery = '';
+let lastExcludeQuery = '';
 
 function removeDiacritics(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -6,7 +7,7 @@ function removeDiacritics(str) {
 
 function observeListChanges(listContainer) {
   const observer = new MutationObserver(() => {
-    filterPlaces(lastQuery);
+    filterPlaces(lastQuery, lastExcludeQuery);
   });
   observer.observe(listContainer, { childList: true, subtree: true });
 }
@@ -17,17 +18,41 @@ function injectFilterUI() {
   const container = document.createElement('div');
   container.id = 'maps-list-filter';
   container.innerHTML = `
-    <input type="text" id="maps-filter-input" placeholder="Search by name, type, price, or notes..." />
+    <div style="padding: 10px; background: white; border: 1px solid #dadce0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-family: Roboto, Arial, sans-serif;">
+      <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes... (use -word to exclude)" style="width: 100%; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
+      <div style="font-size: 12px; color: #5f6368; margin-top: 4px;">
+        Examples: "restaurant -expensive", "coffee -starbucks", "hotel -$200"
+      </div>
+    </div>
   `;
   document.body.appendChild(container);
 
   document.getElementById('maps-filter-input').addEventListener('input', (e) => {
-    lastQuery = e.target.value.toLowerCase();
-    filterPlaces(lastQuery);
+    const input = e.target.value;
+    const { includeTerms, excludeTerms } = parseSearchInput(input);
+    lastQuery = includeTerms.join(' ').toLowerCase();
+    lastExcludeQuery = excludeTerms.join(' ').toLowerCase();
+    filterPlaces(lastQuery, lastExcludeQuery);
   });
 }
 
-function filterPlaces(query) {
+function parseSearchInput(input) {
+  const terms = input.trim().split(/\s+/);
+  const includeTerms = [];
+  const excludeTerms = [];
+  
+  terms.forEach(term => {
+    if (term.startsWith('-') && term.length > 1) {
+      excludeTerms.push(term.substring(1));
+    } else if (term.length > 0) {
+      includeTerms.push(term);
+    }
+  });
+  
+  return { includeTerms, excludeTerms };
+}
+
+function filterPlaces(query, excludeQuery = '') {
   const listContainer = document.querySelector('div[role="main"]');
   if (!listContainer) return;
 
@@ -133,26 +158,42 @@ function filterPlaces(query) {
   
   // console.log(itemsToShowOrHide); // This shows the correct data
 
-  // Then, hide items that don't match (if there's a query)
-  if (query && query.length > 0) {
-    // console.log(`Filtering for query: "${query}"`); // Log the active query
-    const normalizedQuery = removeDiacritics(query);
-    itemsToShowOrHide.forEach(itemData => {
-      const normalizedName = removeDiacritics(itemData.name);
-      const normalizedTypePrice = removeDiacritics(itemData.typePrice);
-      const normalizedNote = removeDiacritics(itemData.note);
+  // Then, apply include and exclude filters
+  itemsToShowOrHide.forEach(itemData => {
+    const normalizedName = removeDiacritics(itemData.name);
+    const normalizedTypePrice = removeDiacritics(itemData.typePrice);
+    const normalizedNote = removeDiacritics(itemData.note);
+    
+    let shouldShow = true;
+    
+    // Apply include filter (if there's a query)
+    if (query && query.length > 0) {
+      const normalizedQuery = removeDiacritics(query);
       const isMatchByName = normalizedName.includes(normalizedQuery);
       const isMatchByTypePrice = normalizedTypePrice.includes(normalizedQuery);
       const isMatchByNote = normalizedNote.includes(normalizedQuery);
       const queryFound = isMatchByName || isMatchByTypePrice || isMatchByNote;
-
+      
       if (!queryFound) {
-        itemData.element.style.display = 'none';
-      } else {
-        itemData.element.style.display = ''; // Explicitly ensure it's shown if matched
+        shouldShow = false;
       }
-    });
-  }
+    }
+    
+    // Apply exclude filter (if there's an exclude query)
+    if (excludeQuery && excludeQuery.length > 0 && shouldShow) {
+      const normalizedExcludeQuery = removeDiacritics(excludeQuery);
+      const isExcludeMatchByName = normalizedName.includes(normalizedExcludeQuery);
+      const isExcludeMatchByTypePrice = normalizedTypePrice.includes(normalizedExcludeQuery);
+      const isExcludeMatchByNote = normalizedNote.includes(normalizedExcludeQuery);
+      const excludeQueryFound = isExcludeMatchByName || isExcludeMatchByTypePrice || isExcludeMatchByNote;
+      
+      if (excludeQueryFound) {
+        shouldShow = false;
+      }
+    }
+    
+    itemData.element.style.display = shouldShow ? '' : 'none';
+  });
 }
 
 function getScrollableListContainer() {
@@ -211,7 +252,7 @@ function waitForListToLoad() {
       injectFilterUI();
       observeListChanges(listContainer);
       autoScrollListToLoadAll(() => {
-        filterPlaces(lastQuery);
+        filterPlaces(lastQuery, lastExcludeQuery);
       });
     }
   }, 1000);
