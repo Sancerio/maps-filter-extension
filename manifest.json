@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Google Maps List Filter",
+  "version": "1.0",
+  "description": "Filter saved places in Google Maps lists",
+  "permissions": ["scripting", "activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.google.com/maps/*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ],
+  "action": {
+    "default_title": "Maps Filter"
+  }
+}
