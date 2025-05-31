@@ -78,4 +78,8 @@ coverage/
 .npm
 
 # Optional eslint cache
-.eslintcache 
+.eslintcache
+
+# Force include extension icons (override any ignore patterns)
+!icons/
+!icons/*.png 
