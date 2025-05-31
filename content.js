@@ -6,10 +6,67 @@ function removeDiacritics(str) {
 }
 
 function observeListChanges(listContainer) {
-  const observer = new MutationObserver(() => {
+  let lastListIdentifier = getListIdentifier(listContainer);
+  let debounceTimer = null;
+  
+  const observer = new MutationObserver((mutations) => {
+    // Check for filtering changes (existing functionality)
     filterPlaces(lastQuery, lastExcludeQuery);
+    
+    // Check if this might be a list navigation (major content change)
+    const hasSignificantChanges = mutations.some(mutation => {
+      // Look for major structural changes that indicate list navigation
+      return mutation.type === 'childList' && 
+             (mutation.addedNodes.length > 5 || mutation.removedNodes.length > 5);
+    });
+    
+    if (hasSignificantChanges) {
+      // Debounce to avoid excessive triggers during rapid changes
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const currentListIdentifier = getListIdentifier(listContainer);
+        
+        // If the list content has significantly changed, re-run auto-scroll
+        if (currentListIdentifier !== lastListIdentifier) {
+          console.log('List navigation detected, re-loading places...');
+          lastListIdentifier = currentListIdentifier;
+          
+          // Re-run auto-scroll for the new list
+          autoScrollListToLoadAll(() => {
+            filterPlaces(lastQuery, lastExcludeQuery);
+          }, 20, true); // isReload = true
+        }
+      }, 1000); // Wait 1 second after changes stop
+    }
   });
-  observer.observe(listContainer, { childList: true, subtree: true });
+  
+  observer.observe(listContainer, { 
+    childList: true, 
+    subtree: true,
+    characterData: true // Also watch for text changes
+  });
+}
+
+// Helper function to identify the current list based on its content
+function getListIdentifier(listContainer) {
+  if (!listContainer) return '';
+  
+  // Create an identifier based on the first few place names and total count
+  const buttons = listContainer.querySelectorAll('button');
+  const placeButtons = Array.from(buttons).filter(button => {
+    const hasImage = button.querySelector('img');
+    const hasHeadline = button.querySelector('h1, h2, h3, h4, .fontHeadlineSmall');
+    const hasMultipleDivsOrSpans = button.querySelectorAll('div, span').length > 2;
+    return (hasImage && hasHeadline) || (hasHeadline && hasMultipleDivsOrSpans) || (hasImage && hasMultipleDivsOrSpans);
+  });
+  
+  // Use first 3 place names + total count as identifier
+  const firstThreeNames = placeButtons.slice(0, 3).map(button => {
+    const nameElement = button.querySelector('h1, h2, h3, h4, .fontHeadlineSmall');
+    return nameElement ? nameElement.textContent.trim() : '';
+  }).join('|');
+  
+  return `${firstThreeNames}:${placeButtons.length}`;
 }
 
 function injectFilterUI() {
@@ -231,8 +288,14 @@ function getScrollableListContainer() {
   return null;
 }
 
-function autoScrollListToLoadAll(callback, maxTries = 20) {
-  showLoadingState(); // Show loading at start
+function autoScrollListToLoadAll(callback, maxTries = 20, isReload = false) {
+  // Show loading with appropriate message
+  if (isReload) {
+    showLoadingState('Loading new list...');
+  } else {
+    showLoadingState();
+  }
+  
   let tries = 0;
   function tryScroll() {
     const scrollable = getScrollableListContainer();
@@ -261,8 +324,12 @@ function autoScrollListToLoadAll(callback, maxTries = 20) {
           sameCount++;
           scrollStep();
         } else {
-          hideLoadingState(); // Hide loading when scrolling is complete
-          if (callback) callback();
+          // Show success message briefly before hiding
+          showSuccessMessage(isReload);
+          setTimeout(() => {
+            hideLoadingState(); // Hide loading when scrolling is complete
+            if (callback) callback();
+          }, 1000);
         }
       }, 500);
     }
@@ -292,22 +359,70 @@ function updateLoadingProgress() {
 }
 
 function waitForListToLoad() {
+  let currentUrl = window.location.href;
+  
   const interval = setInterval(() => {
     const listContainer = document.querySelector('div[role="main"]');
+    
+    // Check if URL has changed (indicates navigation)
+    const newUrl = window.location.href;
+    const urlChanged = newUrl !== currentUrl;
+    currentUrl = newUrl;
+    
     if (listContainer) {
       clearInterval(interval);
       injectFilterUI();
       observeListChanges(listContainer);
+      
+      // Start auto-scroll
       autoScrollListToLoadAll(() => {
         filterPlaces(lastQuery, lastExcludeQuery);
       });
+      
+      // Also monitor for URL changes (list navigation)
+      monitorUrlChanges();
     }
   }, 1000);
 }
 
-function showLoadingState() {
+function monitorUrlChanges() {
+  let lastUrl = window.location.href;
+  let urlCheckInterval;
+  
+  // Monitor URL changes
+  urlCheckInterval = setInterval(() => {
+    const currentUrl = window.location.href;
+    
+    if (currentUrl !== lastUrl) {
+      console.log('URL changed, checking for list navigation...');
+      lastUrl = currentUrl;
+      
+      // Small delay to let the new content load
+      setTimeout(() => {
+        const listContainer = document.querySelector('div[role="main"]');
+        if (listContainer) {
+          // Re-run auto-scroll for the new list
+          autoScrollListToLoadAll(() => {
+            filterPlaces(lastQuery, lastExcludeQuery);
+          }, 20, true); // isReload = true
+        }
+      }, 500);
+    }
+  }, 1000);
+  
+  // Clean up if page is unloaded
+  window.addEventListener('beforeunload', () => {
+    clearInterval(urlCheckInterval);
+  });
+}
+
+function showLoadingState(customMessage = null) {
   const loadingIndicator = document.getElementById('loading-indicator');
   if (loadingIndicator) {
+    const loadingText = loadingIndicator.querySelector('span');
+    if (loadingText && customMessage) {
+      loadingText.textContent = customMessage;
+    }
     loadingIndicator.style.display = 'flex';
   }
 }
@@ -316,6 +431,35 @@ function hideLoadingState() {
   const loadingIndicator = document.getElementById('loading-indicator');
   if (loadingIndicator) {
     loadingIndicator.style.display = 'none';
+    
+    // Reset to default state
+    const loadingSpinner = loadingIndicator.querySelector('.loading-spinner');
+    const loadingText = loadingIndicator.querySelector('span');
+    
+    if (loadingSpinner) {
+      loadingSpinner.style.display = 'block'; // Show spinner for next time
+    }
+    if (loadingText) {
+      loadingText.textContent = 'Loading all places...'; // Reset default text
+    }
+    
+    // Remove success class
+    loadingIndicator.classList.remove('success');
+    loadingIndicator.style.background = ''; // Reset background
+  }
+}
+
+function showSuccessMessage(isReload = false) {
+  const loadingIndicator = document.getElementById('loading-indicator');
+  if (loadingIndicator) {
+    const loadingText = loadingIndicator.querySelector('span');
+    
+    if (loadingText) {
+      loadingText.textContent = isReload ? 'New list loaded!' : 'All places loaded!';
+    }
+    
+    // Add success class for styling
+    loadingIndicator.classList.add('success');
   }
 }
 

@@ -589,4 +589,53 @@ describe('Content Script Unit Tests', () => {
       expect(loadingText.textContent).toBe('Loading places... (2 found)');
     });
   });
+
+  describe('list navigation detection', () => {
+    beforeEach(() => {
+      document.body.innerHTML = '<div role="main"></div>';
+      window.injectFilterUI();
+    });
+
+    test('should generate different identifiers for different lists', () => {
+      const listContainer = document.querySelector('div[role="main"]');
+      
+      // Add mock buttons for first list
+      const mockButton1 = document.createElement('button');
+      mockButton1.innerHTML = '<img src="test.jpg"><h3 class="fontHeadlineSmall">Coffee Shop</h3>';
+      listContainer.appendChild(mockButton1);
+      
+      const firstIdentifier = window.getListIdentifier(listContainer);
+
+      // Clear and add different content
+      listContainer.innerHTML = '';
+      const mockButton2 = document.createElement('button');
+      mockButton2.innerHTML = '<img src="test.jpg"><h3 class="fontHeadlineSmall">Restaurant</h3>';
+      listContainer.appendChild(mockButton2);
+      
+      const secondIdentifier = window.getListIdentifier(listContainer);
+
+      expect(firstIdentifier).not.toBe(secondIdentifier);
+    });
+
+    test('should generate same identifier for same list content', () => {
+      const listContainer = document.querySelector('div[role="main"]');
+      
+      // Add mock buttons
+      const mockButton1 = document.createElement('button');
+      mockButton1.innerHTML = '<img src="test.jpg"><h3 class="fontHeadlineSmall">Coffee Shop</h3>';
+      listContainer.appendChild(mockButton1);
+      
+      const firstIdentifier = window.getListIdentifier(listContainer);
+      const secondIdentifier = window.getListIdentifier(listContainer);
+
+      expect(firstIdentifier).toBe(secondIdentifier);
+    });
+
+    test('should handle custom loading messages', () => {
+      window.showLoadingState('Custom loading message');
+      
+      const loadingText = document.querySelector('#loading-indicator span');
+      expect(loadingText.textContent).toBe('Custom loading message');
+    });
+  });
 }); 
