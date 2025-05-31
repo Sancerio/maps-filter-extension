@@ -14,6 +14,43 @@ describe('Content Script Unit Tests', () => {
   let getScrollableListContainer; // To hold the function from the script
   let filterPlaces; 
 
+  // Helper to create a basic list item structure
+  const createPlaceItem = (id, name, typePrice, note, hasImage = true) => {
+    const itemDiv = document.createElement('div');
+    itemDiv.id = id;
+    // This is a simplified structure. The actual script looks for the button's closest div ancestor.
+    // For unit testing, we make itemDiv the direct parent that would be shown/hidden.
+    
+    const button = document.createElement('button');
+    if (hasImage) {
+      const img = document.createElement('img');
+      img.src = 'fake.jpg';
+      button.appendChild(img);
+    }
+    
+    const nameEl = document.createElement('h3'); // Using h3 as an example for .fontHeadlineSmall or h1-h4
+    nameEl.className = 'fontHeadlineSmall'; 
+    nameEl.textContent = name;
+    button.appendChild(nameEl);
+    
+    // Simulate typePrice by adding it to button's text content after name
+    const typePriceText = document.createTextNode(` ${typePrice}`);
+    button.appendChild(typePriceText);
+
+    itemDiv.appendChild(button);
+
+    // Simulate note element (as a sibling div for simplicity in this mock)
+    if (note) {
+      const noteDiv = document.createElement('div');
+      noteDiv.textContent = note;
+      // Assuming note element is a direct sibling for this test structure.
+      // The actual logic in filterPlaces is more complex (itemDiv.nextElementSibling, etc.)
+      // For more accurate note testing, we might need to refine this structure or test note extraction separately.
+      itemDiv.insertAdjacentElement('afterend', noteDiv);
+    }
+    return itemDiv;
+  };
+
   beforeEach(() => {
     // Create a new JSDOM instance for each test
     // It's important to provide a basic HTML structure.
@@ -170,43 +207,6 @@ describe('Content Script Unit Tests', () => {
   });
 
   describe('filterPlaces', () => {
-    // Helper to create a basic list item structure
-    const createPlaceItem = (id, name, typePrice, note, hasImage = true) => {
-      const itemDiv = document.createElement('div');
-      itemDiv.id = id;
-      // This is a simplified structure. The actual script looks for the button's closest div ancestor.
-      // For unit testing, we make itemDiv the direct parent that would be shown/hidden.
-      
-      const button = document.createElement('button');
-      if (hasImage) {
-        const img = document.createElement('img');
-        img.src = 'fake.jpg';
-        button.appendChild(img);
-      }
-      
-      const nameEl = document.createElement('h3'); // Using h3 as an example for .fontHeadlineSmall or h1-h4
-      nameEl.className = 'fontHeadlineSmall'; 
-      nameEl.textContent = name;
-      button.appendChild(nameEl);
-      
-      // Simulate typePrice by adding it to button's text content after name
-      const typePriceText = document.createTextNode(` ${typePrice}`);
-      button.appendChild(typePriceText);
-
-      itemDiv.appendChild(button);
-
-      // Simulate note element (as a sibling div for simplicity in this mock)
-      if (note) {
-        const noteDiv = document.createElement('div');
-        noteDiv.textContent = note;
-        // Assuming note element is a direct sibling for this test structure.
-        // The actual logic in filterPlaces is more complex (itemDiv.nextElementSibling, etc.)
-        // For more accurate note testing, we might need to refine this structure or test note extraction separately.
-        itemDiv.insertAdjacentElement('afterend', noteDiv);
-      }
-      return itemDiv;
-    };
-
     let listContainer;
 
     beforeEach(() => {
@@ -362,5 +362,187 @@ describe('Content Script Unit Tests', () => {
     });
 
     // Add more tests for edge cases in name/typePrice extraction, various DOM structures, etc.
+  });
+
+  describe('parseSearchInput', () => {
+    test('should parse input with no exclude terms', () => {
+      const result = window.parseSearchInput('restaurant coffee');
+      expect(result.includeTerms).toEqual(['restaurant', 'coffee']);
+      expect(result.excludeTerms).toEqual([]);
+    });
+
+    test('should parse input with only exclude terms', () => {
+      const result = window.parseSearchInput('-expensive -closed');
+      expect(result.includeTerms).toEqual([]);
+      expect(result.excludeTerms).toEqual(['expensive', 'closed']);
+    });
+
+    test('should parse input with mixed include and exclude terms', () => {
+      const result = window.parseSearchInput('restaurant -expensive coffee -starbucks');
+      expect(result.includeTerms).toEqual(['restaurant', 'coffee']);
+      expect(result.excludeTerms).toEqual(['expensive', 'starbucks']);
+    });
+
+    test('should handle empty input', () => {
+      const result = window.parseSearchInput('');
+      expect(result.includeTerms).toEqual([]);
+      expect(result.excludeTerms).toEqual([]);
+    });
+
+    test('should handle whitespace only input', () => {
+      const result = window.parseSearchInput('   ');
+      expect(result.includeTerms).toEqual([]);
+      expect(result.excludeTerms).toEqual([]);
+    });
+
+    test('should ignore standalone minus signs', () => {
+      const result = window.parseSearchInput('restaurant - coffee');
+      expect(result.includeTerms).toEqual(['restaurant', 'coffee']);
+      expect(result.excludeTerms).toEqual([]);
+    });
+
+    test('should handle multiple spaces between terms', () => {
+      const result = window.parseSearchInput('restaurant   -expensive    coffee');
+      expect(result.includeTerms).toEqual(['restaurant', 'coffee']);
+      expect(result.excludeTerms).toEqual(['expensive']);
+    });
+
+    test('should handle terms with special characters', () => {
+      const result = window.parseSearchInput('café -$100+ pizza');
+      expect(result.includeTerms).toEqual(['café', 'pizza']);
+      expect(result.excludeTerms).toEqual(['$100+']);
+    });
+  });
+
+  describe('filterPlaces with exclude functionality', () => {
+    let listContainer;
+
+    beforeEach(() => {
+      document.body.innerHTML = '<div role="main"></div>';
+      listContainer = document.querySelector('div[role="main"]');
+    });
+
+    test('should show all items when both include and exclude queries are empty', () => {
+      const item1 = createPlaceItem('item1', 'Coffee Shop', 'Cafe', 'Good latte');
+      const item2 = createPlaceItem('item2', 'Book Store', 'Retail', 'Great selection');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+
+      filterPlaces('', []);
+
+      expect(item1.style.display).toBe('');
+      expect(item2.style.display).toBe('');
+    });
+
+    test('should exclude items matching exclude query only', () => {
+      const item1 = createPlaceItem('item1', 'Expensive Restaurant', 'Fine Dining', '');
+      const item2 = createPlaceItem('item2', 'Cheap Eats', 'Fast Food', '');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+
+      filterPlaces('', ['expensive']);
+
+      expect(item1.style.display).toBe('none'); // Contains 'expensive'
+      expect(item2.style.display).toBe(''); // Doesn't contain 'expensive'
+    });
+
+    test('should apply both include and exclude filters', () => {
+      const item1 = createPlaceItem('item1', 'Starbucks Coffee', 'Coffee Shop', '');
+      const item2 = createPlaceItem('item2', 'Local Coffee Roasters', 'Coffee Shop', '');
+      const item3 = createPlaceItem('item3', 'Pizza Place', 'Restaurant', '');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+      listContainer.appendChild(item3);
+
+      filterPlaces('coffee', ['starbucks']);
+
+      expect(item1.style.display).toBe('none'); // Matches include 'coffee' but also matches exclude 'starbucks'
+      expect(item2.style.display).toBe(''); // Matches include 'coffee' and doesn't match exclude 'starbucks'
+      expect(item3.style.display).toBe('none'); // Doesn't match include 'coffee'
+    });
+
+    test('should exclude by type/price', () => {
+      const item1 = createPlaceItem('item1', 'Fine Restaurant', '$100+ per person', '');
+      const item2 = createPlaceItem('item2', 'Casual Diner', '$10-20 per person', '');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+
+      filterPlaces('restaurant', ['$100']);
+
+      expect(item1.style.display).toBe('none'); // Matches include 'restaurant' but also matches exclude '$100'
+      expect(item2.style.display).toBe('none'); // Doesn't match include 'restaurant' (has 'diner')
+    });
+
+    test('should exclude by note content', () => {
+      // Create items with inline notes
+      listContainer.innerHTML = '';
+      
+      const place1 = document.createElement('div');
+      place1.id = 'place1';
+      const btn1 = createPlaceItem('btn1', 'Park Cafe', 'Outdoor', '').querySelector('button');
+      place1.appendChild(btn1);
+      const note1 = document.createElement('div');
+      note1.textContent = 'Currently closed for renovation';
+      note1.className = 'item-note';
+      place1.appendChild(note1);
+      listContainer.appendChild(place1);
+
+      const place2 = document.createElement('div');
+      place2.id = 'place2';
+      const btn2 = createPlaceItem('btn2', 'Beach Cafe', 'Outdoor', '').querySelector('button');
+      place2.appendChild(btn2);
+      const note2 = document.createElement('div');
+      note2.textContent = 'Great ocean view';
+      note2.className = 'item-note';
+      place2.appendChild(note2);
+      listContainer.appendChild(place2);
+
+      filterPlaces('cafe', ['closed']);
+
+      expect(place1.style.display).toBe('none'); // Matches include 'cafe' but also matches exclude 'closed'
+      expect(place2.style.display).toBe(''); // Matches include 'cafe' and doesn't match exclude 'closed'
+    });
+
+    test('should handle diacritics in exclude queries', () => {
+      const item1 = createPlaceItem('item1', 'Café Français', 'French Bistro', '');
+      const item2 = createPlaceItem('item2', 'American Diner', 'Classic Food', '');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+
+      filterPlaces('', ['francais']); // Search without diacritics
+
+      expect(item1.style.display).toBe('none'); // 'Français' should match 'francais'
+      expect(item2.style.display).toBe(''); // Doesn't contain 'francais'
+    });
+
+    test('should exclude items when include filter passes but exclude filter matches', () => {
+      const item1 = createPlaceItem('item1', 'McDonald\'s', 'Fast Food Restaurant', '');
+      const item2 = createPlaceItem('item2', 'Local Burger Joint', 'Fast Food Restaurant', '');
+      const item3 = createPlaceItem('item3', 'Pizza Palace', 'Italian Restaurant', '');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+      listContainer.appendChild(item3);
+
+      filterPlaces('restaurant', ['mcdonald']);
+
+      expect(item1.style.display).toBe('none'); // Matches include 'restaurant' but also matches exclude 'mcdonald'
+      expect(item2.style.display).toBe(''); // Matches include 'restaurant' and doesn't match exclude 'mcdonald'
+      expect(item3.style.display).toBe(''); // Matches include 'restaurant' and doesn't match exclude 'mcdonald'
+    });
+
+    test('should show items that match include but not exclude', () => {
+      const item1 = createPlaceItem('item1', 'Expensive Sushi', 'Japanese $$$', '');
+      const item2 = createPlaceItem('item2', 'Affordable Sushi', 'Japanese $', '');
+      const item3 = createPlaceItem('item3', 'Cheap Pizza', 'Italian $', '');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+      listContainer.appendChild(item3);
+
+      filterPlaces('japanese', ['expensive']);
+
+      expect(item1.style.display).toBe('none'); // Matches include 'japanese' but also matches exclude 'expensive'
+      expect(item2.style.display).toBe(''); // Matches include 'japanese' and doesn't match exclude 'expensive'
+      expect(item3.style.display).toBe('none'); // Doesn't match include 'japanese'
+    });
   });
 }); 

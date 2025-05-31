@@ -1,5 +1,5 @@
 let lastQuery = '';
-let lastExcludeQuery = '';
+let lastExcludeQuery = [];
 
 function removeDiacritics(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -18,11 +18,12 @@ function injectFilterUI() {
   const container = document.createElement('div');
   container.id = 'maps-list-filter';
   container.innerHTML = `
-    <div style="padding: 10px; background: white; border: 1px solid #dadce0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); font-family: Roboto, Arial, sans-serif;">
-      <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes... (use -word to exclude)" style="width: 100%; padding: 8px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; box-sizing: border-box;" />
-      <div style="font-size: 12px; color: #5f6368; margin-top: 4px;">
-        Examples: "restaurant -expensive", "coffee -starbucks", "hotel -$200"
-      </div>
+    <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes..." />
+    <div class="filter-examples">
+      Hint: use -word to exclude
+    </div>
+    <div class="filter-examples">
+      Examples: "restaurant -expensive", "mala -✅"
     </div>
   `;
   document.body.appendChild(container);
@@ -31,7 +32,7 @@ function injectFilterUI() {
     const input = e.target.value;
     const { includeTerms, excludeTerms } = parseSearchInput(input);
     lastQuery = includeTerms.join(' ').toLowerCase();
-    lastExcludeQuery = excludeTerms.join(' ').toLowerCase();
+    lastExcludeQuery = excludeTerms.map(term => term.toLowerCase());
     filterPlaces(lastQuery, lastExcludeQuery);
   });
 }
@@ -44,7 +45,7 @@ function parseSearchInput(input) {
   terms.forEach(term => {
     if (term.startsWith('-') && term.length > 1) {
       excludeTerms.push(term.substring(1));
-    } else if (term.length > 0) {
+    } else if (term.length > 0 && term !== '-') {
       includeTerms.push(term);
     }
   });
@@ -52,7 +53,7 @@ function parseSearchInput(input) {
   return { includeTerms, excludeTerms };
 }
 
-function filterPlaces(query, excludeQuery = '') {
+function filterPlaces(query, excludeQuery = []) {
   const listContainer = document.querySelector('div[role="main"]');
   if (!listContainer) return;
 
@@ -103,17 +104,29 @@ function filterPlaces(query, excludeQuery = '') {
 
     // Path 2: If note not found as a direct sibling, or to ensure we capture textarea notes correctly (e.g., from real Google Maps HTML).
     if (note === '') { 
-        // Look for a textarea (common in real Google Maps HTML, e.g., textarea.MP5iJf or textarea[aria-label="Note"])
-        const noteTextarea = itemDiv.querySelector('textarea[aria-label="Note"], textarea.MP5iJf, textarea[jslog*="note"]');
+        // Look for textarea with stable attributes (aria-label, placeholder, or data attributes)
+        const noteTextarea = itemDiv.querySelector(
+          'textarea[aria-label*="ote"], textarea[aria-label*="Note"], ' +
+          'textarea[placeholder*="ote"], textarea[placeholder*="Note"], ' +
+          'textarea[data-value], textarea[role="textbox"]'
+        );
         if (noteTextarea && typeof noteTextarea.value === 'string') {
             note = noteTextarea.value.trim().toLowerCase();
         } else {
-            // Fallback: Look for other common div/span note containers *inside* itemDiv.
-            // This might catch notes displayed as plain text within itemDiv or notes within a wrapper like div.bXMMS.
-            const inlineNoteElement = itemDiv.querySelector('div.bXMMS, div.item-note, div[class*="note"], span[class*="note"]');
+            // Fallback: Look for note containers using more stable selectors
+            // Target elements that contain textareas or have note-like content
+            const inlineNoteElement = itemDiv.querySelector(
+              'div[class*="note"], span[class*="note"], ' +
+              'div:has(textarea), span:has(textarea), ' +
+              '[aria-label*="ote"], [data-value], ' +
+              'div[contenteditable="true"], span[contenteditable="true"]'
+            );
             if (inlineNoteElement) {
                 // If this element wraps a textarea, prioritize textarea's value.
-                const innerTextarea = inlineNoteElement.querySelector('textarea[aria-label="Note"], textarea.MP5iJf');
+                const innerTextarea = inlineNoteElement.querySelector(
+                  'textarea[aria-label*="ote"], textarea[placeholder*="ote"], ' +
+                  'textarea[data-value], textarea[role="textbox"]'
+                );
                 if (innerTextarea && typeof innerTextarea.value === 'string') {
                     note = innerTextarea.value.trim().toLowerCase();
                 } else {
@@ -179,15 +192,17 @@ function filterPlaces(query, excludeQuery = '') {
       }
     }
     
-    // Apply exclude filter (if there's an exclude query)
+    // Apply exclude filter (if there are exclude terms)
     if (excludeQuery && excludeQuery.length > 0 && shouldShow) {
-      const normalizedExcludeQuery = removeDiacritics(excludeQuery);
-      const isExcludeMatchByName = normalizedName.includes(normalizedExcludeQuery);
-      const isExcludeMatchByTypePrice = normalizedTypePrice.includes(normalizedExcludeQuery);
-      const isExcludeMatchByNote = normalizedNote.includes(normalizedExcludeQuery);
-      const excludeQueryFound = isExcludeMatchByName || isExcludeMatchByTypePrice || isExcludeMatchByNote;
+      const shouldExclude = excludeQuery.some(excludeTerm => {
+        const normalizedExcludeTerm = removeDiacritics(excludeTerm);
+        const isExcludeMatchByName = normalizedName.includes(normalizedExcludeTerm);
+        const isExcludeMatchByTypePrice = normalizedTypePrice.includes(normalizedExcludeTerm);
+        const isExcludeMatchByNote = normalizedNote.includes(normalizedExcludeTerm);
+        return isExcludeMatchByName || isExcludeMatchByTypePrice || isExcludeMatchByNote;
+      });
       
-      if (excludeQueryFound) {
+      if (shouldExclude) {
         shouldShow = false;
       }
     }

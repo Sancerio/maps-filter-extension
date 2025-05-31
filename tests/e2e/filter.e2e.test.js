@@ -53,7 +53,7 @@ describe('Google Maps List Filter E2E Tests', () => {
     
     // Check its placeholder
     const placeholder = await page.evaluate(el => el.placeholder, filterInput);
-    expect(placeholder).toBe('Search by name, type, price, or notes...');
+    expect(placeholder).toBe('Filter places by name, type, price, or notes... (use -word to exclude)');
   });
 
   test('should show all items when filter is empty', async () => {
@@ -123,6 +123,47 @@ describe('Google Maps List Filter E2E Tests', () => {
     const item2 = await page.$('#item2');
     expect(await page.evaluate(el => el.style.display, item1)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none');
+  });
+
+  test('should exclude items using minus syntax', async () => {
+    await page.type('#maps-filter-input', '-Coffee');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const item1 = await page.$('#item1'); // Coffee Supreme
+    const item2 = await page.$('#item2'); // Page Turner Bookstore
+    expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (contains Coffee)
+    expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none'); // Should be visible (no Coffee)
+  });
+
+  test('should apply both include and exclude filters', async () => {
+    await page.type('#maps-filter-input', 'Bookstore -used');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const item2 = await page.$('#item2'); // Page Turner Bookstore
+    const item1 = await page.$('#item1'); // Coffee Supreme
+    expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none'); // Should be visible (has Bookstore, no 'used')
+    expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (no Bookstore)
+  });
+
+  test('should exclude by note content', async () => {
+    await page.type('#maps-filter-input', '-brew');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const item1 = await page.$('#item1'); // Has 'cold brew' in note
+    const item2 = await page.$('#item2'); // No 'brew' in note
+    expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (note contains 'brew')
+    expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none'); // Should be visible (no 'brew' in note)
+  });
+
+  test('should handle multiple exclude terms', async () => {
+    await page.type('#maps-filter-input', '-Coffee -Bookstore');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const item1 = await page.$('#item1'); // Coffee Supreme (contains "Coffee")
+    const item2 = await page.$('#item2'); // Best Books with "Bookstore" in details
+    const item3 = await page.$('#item3'); // Central Park (should be visible)
+    
+    expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (contains Coffee)
+    expect(await page.evaluate(el => el.style.display, item2)).toBe('none'); // Should be hidden (contains Bookstore)
+    if (item3) {
+      expect(await page.evaluate(el => el.style.display, item3)).not.toBe('none'); // Should be visible if it doesn't contain Coffee or Bookstore
+    }
   });
 
   // TODO: Add tests for observing list changes (dynamically add item and check filter)
