@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Maps List</title>
+    <style>
+        /* Basic styling to help visualize */
+        body { font-family: sans-serif; }
+        #maps-list-filter { margin-bottom: 10px; padding: 10px; background-color: #f0f0f0; border: 1px solid #ccc; }
+        #maps-list-filter input { width: 300px; padding: 5px; }
+        .list-item-container { border: 1px solid #eee; margin-bottom: 5px; padding: 5px; }
+        .list-item-container button { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid #ddd; padding: 8px; cursor: pointer; }
+        .list-item-container button:hover { background: #f9f9f9; }
+        .list-item-container img { width: 50px; height: 50px; vertical-align: middle; margin-right: 10px; background-color: #ddd; }
+        .list-item-container .fontHeadlineSmall { font-size: 1.1em; font-weight: bold; color: #333; }
+        .list-item-container .details { font-size: 0.9em; color: #666; }
+        .item-note { background-color: #ffffe0; border: 1px solid #eee; padding: 5px; margin-top: 3px; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <!-- The filter UI will be injected by content.js -->
+
+    <div role="main" id="search_results">
+        <!-- Item 1 -->
+        <div class="list-item-container" id="item1_wrapper">
+            <div class="place-card" id="item1">
+                <button>
+                    <img src="fake_img.png" alt="Place image">
+                    <span class="fontHeadlineSmall">Coffee Supreme</span>
+                    <span class="details">Cafe · $$ · Great espresso</span>
+                </button>
+            </div>
+            <!-- Note as a sibling div, which filterPlaces can find -->
+            <div class="item-note">Personal Note: Try the new cold brew.</div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="list-item-container" id="item2_wrapper">
+            <div class="place-card" id="item2">
+                <button>
+                    <img src="fake_img.png" alt="Place image">
+                    <span class="fontHeadlineSmall">Best Books</span>
+                    <span class="details">Bookstore · Fiction & Non-fiction</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="list-item-container" id="item3_wrapper">
+            <div class="place-card" id="item3">
+                <button>
+                    <!-- No image, to test that condition -->
+                    <span class="fontHeadlineSmall">Central Park</span>
+                    <span class="details">Park · Open 24 Hours</span>
+                    <div>Many spans and divs here</div>
+                    <span>Another span</span>
+                </button>
+            </div>
+             <div class="item-note">User Memo: Morning jogs are best.</div>
+        </div>
+
+        <!-- Item 4 (for diacritics) -->
+        <div class="list-item-container" id="item4_wrapper">
+            <div class="place-card" id="item4">
+                <button>
+                    <img src="fake_img.png" alt="Place image">
+                    <span class="fontHeadlineSmall">Pâtisserie Française</span>
+                    <span class="details">Bakery · Croissants & Éclairs</span>
+                </button>
+            </div>
+            <!-- Inline note -->
+            <div class="item-note" style="margin-left: 10px;">Review: Amazing délices!</div>
+        </div>
+
+        <!-- Item 5 (to be hidden initially by a specific query) -->
+        <div class="list-item-container" id="item5_wrapper">
+             <div class="place-card" id="item5">
+                <button>
+                    <img src="fake_img.png" alt="Place image">
+                    <span class="fontHeadlineSmall">The Tech Hub</span>
+                    <span class="details">Electronics Store · Gadgets</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Add more items to test scrolling if possible, though true dynamic loading is hard here -->
+        <!-- For now, these 5 items should be enough for basic E2E filtering tests -->
+    </div>
+
+</body>
+</html> 

@@ -4,9 +4,14 @@
   "version": "1.0",
   "description": "Filter saved places in Google Maps lists",
   "permissions": ["scripting", "activeTab"],
+  "icons": {
+    "16": "icon_16x16.png",
+    "48": "icon_48x48.png",
+    "128": "icon_128x128.png"
+  },
   "content_scripts": [
     {
-      "matches": ["https://www.google.com/maps/*"],
+      "matches": ["https://www.google.com/maps/*", "file://*/*"],
       "js": ["content.js"],
       "css": ["style.css"]
     }

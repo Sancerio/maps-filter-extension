@@ -17,7 +17,7 @@ function injectFilterUI() {
   const container = document.createElement('div');
   container.id = 'maps-list-filter';
   container.innerHTML = `
-    <input type="text" id="maps-filter-input" placeholder="Filter places..." />
+    <input type="text" id="maps-filter-input" placeholder="Search by name, type, price, or notes..." />
   `;
   document.body.appendChild(container);
 
@@ -68,20 +68,35 @@ function filterPlaces(query) {
       typePrice = button.textContent.trim().toLowerCase().replace(/\s+/g, ' ');
     }
 
-    // Extract note: look for a textarea or a div/span with user note text near the button
-    // Heuristic: look for a sibling or next element with a textarea or a div with a lot of text
-    let noteElement = null;
-    // Try next sibling
-    let next = itemDiv.nextElementSibling;
-    if (next) {
-      noteElement = next.querySelector('textarea, div, span');
+    // Extract note: 
+    const itemDivNextSibling = itemDiv.nextElementSibling;
+
+    // Path 1: Check if the direct next sibling of itemDiv seems to be a note container (matches E2E fixture structure for item1, item4 notes).
+    if (itemDivNextSibling && itemDivNextSibling.matches('div.item-note, span.item-note, div[class*="note"], span[class*="note"]')) {
+        note = itemDivNextSibling.textContent.trim().toLowerCase();
     }
-    // Or look for a textarea or div with a lot of text inside itemDiv (for inline notes)
-    if (!noteElement) {
-      noteElement = itemDiv.querySelector('textarea, div, span');
-    }
-    if (noteElement && noteElement.textContent && noteElement.textContent.trim().length > 0) {
-      note = noteElement.textContent.trim().toLowerCase();
+
+    // Path 2: If note not found as a direct sibling, or to ensure we capture textarea notes correctly (e.g., from real Google Maps HTML).
+    if (note === '') { 
+        // Look for a textarea (common in real Google Maps HTML, e.g., textarea.MP5iJf or textarea[aria-label="Note"])
+        const noteTextarea = itemDiv.querySelector('textarea[aria-label="Note"], textarea.MP5iJf, textarea[jslog*="note"]');
+        if (noteTextarea && typeof noteTextarea.value === 'string') {
+            note = noteTextarea.value.trim().toLowerCase();
+        } else {
+            // Fallback: Look for other common div/span note containers *inside* itemDiv.
+            // This might catch notes displayed as plain text within itemDiv or notes within a wrapper like div.bXMMS.
+            const inlineNoteElement = itemDiv.querySelector('div.bXMMS, div.item-note, div[class*="note"], span[class*="note"]');
+            if (inlineNoteElement) {
+                // If this element wraps a textarea, prioritize textarea's value.
+                const innerTextarea = inlineNoteElement.querySelector('textarea[aria-label="Note"], textarea.MP5iJf');
+                if (innerTextarea && typeof innerTextarea.value === 'string') {
+                    note = innerTextarea.value.trim().toLowerCase();
+                } else {
+                    // Otherwise, take the textContent of the found inlineNoteElement itself.
+                    note = inlineNoteElement.textContent.trim().toLowerCase();
+                }
+            }
+        }
     }
 
     if ((!name || name.length < 3) && typePrice.length > 0) {
@@ -116,11 +131,11 @@ function filterPlaces(query) {
     itemData.element.style.display = ''; 
   });
   
-  console.log(itemsToShowOrHide); // This shows the correct data
+  // console.log(itemsToShowOrHide); // This shows the correct data
 
   // Then, hide items that don't match (if there's a query)
   if (query && query.length > 0) {
-    console.log(`Filtering for query: "${query}"`); // Log the active query
+    // console.log(`Filtering for query: "${query}"`); // Log the active query
     const normalizedQuery = removeDiacritics(query);
     itemsToShowOrHide.forEach(itemData => {
       const normalizedName = removeDiacritics(itemData.name);
@@ -202,4 +217,7 @@ function waitForListToLoad() {
   }, 1000);
 }
 
-waitForListToLoad();
+// Only run waitForListToLoad if not in a test environment
+if (typeof __TEST_ENV__ === 'undefined') {
+  waitForListToLoad();
+}
