@@ -181,4 +181,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Enjoy filtering your Google Maps lists!** ⭐ If you find this extension helpful, please consider giving it a star on GitHub. 
+**Enjoy filtering your Google Maps lists!** ⭐  
+If you find this extension helpful, please consider giving it a star on GitHub.
+
+You can also support future updates and development:
+
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub-lightgrey?logo=github)](https://github.com/sponsors/Sancerio)
+
