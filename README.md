@@ -2,16 +2,19 @@
 
 A browser extension that adds a powerful search and filter functionality to your saved places in Google Maps lists. Easily find specific restaurants, hotels, or attractions by searching through names, types, prices, or your personal notes.
 
-![Extension Demo](demo.gif) <!-- TODO -->
+![Extension in Action](images/screenshot-4-full-list.png)
+*Your complete list of saved places with the filter UI in the top-right corner*
 
 ## ✨ Features
 
 - 🔍 **Smart Search**: Filter places by name, type, price, or notes
+- ❌ **Exclude Filtering**: Use `-word` syntax to exclude unwanted results  
 - 🎯 **Real-time Filtering**: Results update as you type
 - 🌍 **Diacritic Support**: Searches work with accented characters
 - 🎨 **Clean UI**: Non-intrusive overlay that matches Google's design
 - ⚡ **Auto-loading**: Automatically loads all places in long lists
 - 📱 **Responsive**: Works seamlessly on different screen sizes
+- 🔄 **List Navigation**: Automatically reloads when switching between lists
 
 ## 🚀 Installation
 
@@ -55,11 +58,26 @@ A browser extension that adds a powerful search and filter functionality to your
    - Price ranges (e.g., "$", "$$$$")
    - Your personal notes
 
+![Basic Filtering](images/screenshot-3-mount-filter.png)
+*Filtering for "mount" shows all mountain-related places*
+
+### Advanced Filtering with Exclusions
+
+Use the `-` prefix to exclude specific terms from your results:
+
+![Exclude Filtering](images/screenshot-1-exclude-demo.png)
+*Searching "mount -laojun" shows mountain places but excludes Laojun Mountain*
+
 ### Example Searches
 - `"coffee"` - Find all coffee shops
+- `"restaurant -expensive"` - Restaurants but exclude expensive ones
 - `"$$"` - Filter by price range
 - `"romantic"` - Search your notes for romantic places
-- `"museum"` - Find all museums in your list
+- `"museum -closed"` - Museums excluding any marked as closed
+- `"mala -✅"` - Find mala places excluding completed ones
+
+![Partial Match Filtering](images/screenshot-2-nex-filter.png)
+*Even partial matches like "nex" will find relevant places*
 
 ## 🛠️ Development
 
@@ -77,6 +95,9 @@ cd maps-filter-extension
 # Install development dependencies (optional)
 npm install
 
+# Run tests
+npm test
+
 # Load the extension in developer mode (see Installation section)
 ```
 
@@ -92,6 +113,10 @@ maps-filter-extension/
 │   └── icon_128x128.png
 ├── scripts/           # Build and utility scripts
 │   └── pack.sh        # Distribution packaging script
+├── tests/             # Test suite
+│   ├── unit/          # Unit tests
+│   ├── e2e/           # End-to-end tests
+│   └── fixtures/      # Test data
 ├── .gitignore         # Git ignore rules
 └── README.md          # This file
 ```
@@ -109,17 +134,34 @@ This creates a `google-maps-list-filter-v1.0.zip` file ready for store submissio
 
 ## 🧪 Testing
 
-The extension includes built-in compatibility with various Google Maps list formats and handles:
+The extension includes comprehensive test coverage with both unit and end-to-end tests:
+
+```bash
+# Run all tests
+npm test
+
+# Run only unit tests
+npm test tests/unit
+
+# Run only E2E tests
+npm test tests/e2e
+```
+
+The extension is tested for compatibility with various Google Maps list formats and handles:
 - Dynamic content loading
 - Different list layouts
 - Various place information structures
 - Real-time DOM changes
+- List navigation and switching
+- Exclude filtering functionality
 
 ### Manual Testing
 1. Create a Google Maps list with diverse places
 2. Add notes to some places
 3. Test filtering by different criteria
-4. Verify results update in real-time
+4. Test exclude functionality with `-word` syntax
+5. Verify results update in real-time
+6. Test navigation between different lists
 
 ## 🤝 Contributing
 
@@ -133,6 +175,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
    ```
 3. **Make your changes**
 4. **Test thoroughly**
+   ```bash
+   npm test
+   ```
 5. **Commit your changes**
    ```bash
    git commit -m 'Add amazing feature'
@@ -146,6 +191,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ### Development Guidelines
 - Follow existing code style
 - Test on multiple browsers when possible
+- Add tests for new features
 - Update documentation for new features
 - Keep the UI minimal and non-intrusive
 
@@ -154,6 +200,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Works only on `google.com/maps` domain
 - Requires lists to be fully loaded (extension auto-loads them)
 - Some very old Google Maps layouts may not be supported
+- Auto-scroll only triggers for actual list content, not list overview pages
 
 ## 📝 Changelog
 
@@ -163,6 +210,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Real-time filtering
 - Diacritic support
 - Auto-loading of list items
+- Exclude filtering with `-word` syntax
+- Smart list navigation detection
+- Loading states and progress indicators
+- Comprehensive test coverage
 
 ## 📄 License
 
