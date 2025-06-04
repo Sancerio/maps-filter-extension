@@ -12,7 +12,8 @@ describe('Content Script Unit Tests', () => {
   let document;
   let removeDiacritics; // To hold the function from the script
   let getScrollableListContainer; // To hold the function from the script
-  let filterPlaces; 
+  let filterPlaces;
+  let fuzzyMatch;
 
   // Helper to create a basic list item structure
   const createPlaceItem = (id, name, typePrice, note, hasImage = true) => {
@@ -72,7 +73,8 @@ describe('Content Script Unit Tests', () => {
     // Assign the function from the script's global scope (within JSDOM)
     removeDiacritics = window.removeDiacritics;
     getScrollableListContainer = window.getScrollableListContainer;
-    filterPlaces = window.filterPlaces; 
+    filterPlaces = window.filterPlaces;
+    fuzzyMatch = window.fuzzyMatch;
     // Mock the global lastQuery, as filterPlaces uses it when called from autoScrollListToLoadAll
     window.lastQuery = '';
   });
@@ -116,6 +118,16 @@ describe('Content Script Unit Tests', () => {
 
     test('should handle complex strings with various diacritics', () => {
       expect(removeDiacritics('déjà vu à la Pâtisserie')).toBe('deja vu a la Patisserie');
+    });
+  });
+
+  describe('fuzzyMatch', () => {
+    test('should match text with characters in order', () => {
+      expect(fuzzyMatch('cfe sup', 'Coffee Supreme')).toBe(true);
+    });
+
+    test('should not match when characters are not in order', () => {
+      expect(fuzzyMatch('cfesmu', 'Coffee Supreme')).toBe(false);
     });
   });
 
@@ -234,6 +246,18 @@ describe('Content Script Unit Tests', () => {
       listContainer.appendChild(item2);
 
       filterPlaces('pizza place');
+
+      expect(item1.style.display).toBe('');
+      expect(item2.style.display).toBe('none');
+    });
+
+    test('should filter by name using fuzzy search', () => {
+      const item1 = createPlaceItem('item1', 'Coffee Supreme', 'Cafe', '');
+      const item2 = createPlaceItem('item2', 'Book Store', 'Retail', '');
+      listContainer.appendChild(item1);
+      listContainer.appendChild(item2);
+
+      filterPlaces('cfe sup');
 
       expect(item1.style.display).toBe('');
       expect(item2.style.display).toBe('none');
