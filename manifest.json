@@ -3,7 +3,7 @@
   "name": "Google Maps List Filter",
   "version": "1.0",
   "description": "Easily search and filter your saved places in Google Maps lists by name, type, price, or notes with a convenient search overlay",
-  "permissions": ["scripting", "activeTab"],
+  "permissions": [],
   "icons": {
     "16": "icons/icon_16x16.png",
     "48": "icons/icon_48x48.png",
