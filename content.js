@@ -114,6 +114,17 @@ function parseSearchInput(input) {
   return { includeTerms, excludeTerms };
 }
 
+function fuzzyMatch(query, text) {
+  if (!query) return true;
+  const normalizedQuery = removeDiacritics(query.toLowerCase().replace(/\s+/g, ''));
+  const normalizedText = removeDiacritics(text.toLowerCase());
+
+  const escaped = normalizedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = escaped.split('').join('.*');
+  const regex = new RegExp(pattern);
+  return regex.test(normalizedText);
+}
+
 function filterPlaces(query, excludeQuery = []) {
   const listContainer = document.querySelector('div[role="main"]');
   if (!listContainer) return;
@@ -242,12 +253,11 @@ function filterPlaces(query, excludeQuery = []) {
     
     // Apply include filter (if there's a query)
     if (query && query.length > 0) {
-      const normalizedQuery = removeDiacritics(query);
-      const isMatchByName = normalizedName.includes(normalizedQuery);
-      const isMatchByTypePrice = normalizedTypePrice.includes(normalizedQuery);
-      const isMatchByNote = normalizedNote.includes(normalizedQuery);
+      const isMatchByName = fuzzyMatch(query, itemData.name);
+      const isMatchByTypePrice = fuzzyMatch(query, itemData.typePrice);
+      const isMatchByNote = fuzzyMatch(query, itemData.note);
       const queryFound = isMatchByName || isMatchByTypePrice || isMatchByNote;
-      
+
       if (!queryFound) {
         shouldShow = false;
       }
