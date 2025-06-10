@@ -2,7 +2,7 @@
 
 A browser extension that adds a powerful search and filter functionality to your saved places in Google Maps lists. Easily find specific restaurants, hotels, or attractions by searching through names, types, prices, or your personal notes.
 
-![Extension in Action](images/screenshot-4-full-list.png)
+![Extension in Action](assets/demo.gif)
 *Your complete list of saved places with the filter UI in the top-right corner*
 
 ## ✨ Features
