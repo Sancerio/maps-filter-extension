@@ -20,8 +20,8 @@ A browser extension that adds a powerful search and filter functionality to your
 
 ### From Browser Extension Stores
 
-**Chrome Web Store** (Coming Soon)
-- Visit the [Chrome Web Store page](#) 
+**Chrome Web Store**
+- Visit the [Chrome Web Store page](https://chromewebstore.google.com/detail/cbbcmnjjnjppiblignienleehdgffhim)
 - Click "Add to Chrome"
 
 **Firefox Add-ons** (Coming Soon)
