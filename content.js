@@ -9,11 +9,24 @@ function removeDiacritics(str) {
 function extractAllText(element) {
   if (!element) return '';
   let text = '';
-  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
+  const walker = document.createTreeWalker(
+    element,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
   let node;
   while ((node = walker.nextNode())) {
-    if (node.textContent) {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent) {
       text += ' ' + node.textContent.trim();
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const el = node;
+      const alt = el.getAttribute && el.getAttribute('alt');
+      const aria = el.getAttribute && el.getAttribute('aria-label');
+      const title = el.getAttribute && el.getAttribute('title');
+      if (alt) text += ' ' + alt.trim();
+      if (aria) text += ' ' + aria.trim();
+      if (title) text += ' ' + title.trim();
     }
   }
   return text.toLowerCase().replace(/\s+/g, ' ').trim();
