@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Google Maps List Filter",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Easily search and filter your saved places in Google Maps lists by name, type, price, or notes with a convenient search overlay",
   "permissions": [],
   "icons": {
@@ -11,9 +11,16 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.google.com/maps/*", "file://*/*"],
-      "js": ["content.js"],
-      "css": ["style.css"]
+      "matches": [
+        "https://www.google.com/maps/*",
+        "file://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "style.css"
+      ]
     }
   ],
   "action": {
