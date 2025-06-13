@@ -1,0 +1,38 @@
+name: Publish extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    container:
+      image: node:18-bullseye-slim
+    steps:
+      - uses: actions/checkout@v3
+      - run: apt-get update && apt-get install -y zip
+      - run: npm ci
+      - run: npm test
+      - run: ./scripts/pack.sh
+      - name: Get version
+        id: version
+        run: echo "version=$(node -p \"require('./manifest.json').version\")" >> "$GITHUB_OUTPUT"
+      - name: Upload to Chrome Web Store
+        uses: google-github-actions/upload-chrome-extension@v0
+        with:
+          extension_id: ${{ secrets.CHROME_EXTENSION_ID }}
+          zip_file: google-maps-list-filter-v${{ steps.version.outputs.version }}.zip
+          client_id: ${{ secrets.CHROME_CLIENT_ID }}
+          client_secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh_token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          publish: true
+      - name: Upload to Firefox Add-ons
+        run: |
+          npm install -g web-ext
+          web-ext sign \
+            --source-dir dist \
+            --api-key ${{ secrets.FIREFOX_JWT_ISSUER }} \
+            --api-secret ${{ secrets.FIREFOX_JWT_SECRET }} \
+            --channel listed

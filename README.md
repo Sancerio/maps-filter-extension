@@ -133,6 +133,24 @@ chmod +x scripts/pack.sh
 
 This creates a `google-maps-list-filter-v1.0.zip` file ready for store submission.
 
+## 🚀 Continuous Deployment
+
+The GitHub Actions workflow (`.github/workflows/publish.yml`) uses a lightweight
+`node:18-bullseye-slim` container to automatically package and publish new
+versions to the Chrome Web Store and Firefox Add-ons whenever a version tag is
+pushed. To enable it, create API credentials
+for both stores and add the following secrets in your repository settings:
+
+- `CHROME_CLIENT_ID`
+- `CHROME_CLIENT_SECRET`
+- `CHROME_REFRESH_TOKEN`
+- `CHROME_EXTENSION_ID`
+- `FIREFOX_JWT_ISSUER`
+- `FIREFOX_JWT_SECRET`
+
+Push a tag such as `v1.1` to trigger the workflow. See
+[docs/ci-publishing.md](docs/ci-publishing.md) for more details.
+
 ## 🧪 Testing
 
 The extension includes comprehensive test coverage with both unit and end-to-end tests:
