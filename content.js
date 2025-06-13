@@ -198,6 +198,62 @@ function filterPlaces(query, excludeQuery = []) {
         }
     }
 
+    // Path 3: Look for public list note structure using stable selectors
+    if (note === '') {
+        // Look for divs with fontBodyMedium class that contain spans with font-weight styling
+        // This targets the note structure without relying on generated class names
+        const noteContainers = itemDiv.querySelectorAll('div.fontBodyMedium');
+        for (const container of noteContainers) {
+            // Check if this container has jsaction attributes (indicates it's a note container)
+            const hasJsAction = container.hasAttribute('jsaction');
+            
+            if (hasJsAction) {
+                // Look for span with font-weight styling inside this container
+                const noteContentSpan = container.querySelector('span[style*="font-weight"]');
+                if (noteContentSpan) {
+                    note = noteContentSpan.textContent.trim().toLowerCase();
+                    break;
+                } else {
+                    // Alternative: look for nested divs that might contain the note
+                    const nestedDivs = container.querySelectorAll('div div span');
+                    for (const span of nestedDivs) {
+                        const spanText = span.textContent.trim();
+                        if (spanText && spanText.length > 0) {
+                            // Make sure this isn't just duplicate place name/info
+                            const buttonText = button.textContent.trim().toLowerCase();
+                            if (!buttonText.includes(spanText.toLowerCase())) {
+                                note = spanText.toLowerCase();
+                                break;
+                            }
+                        }
+                    }
+                    if (note) break;
+                }
+            }
+        }
+        
+        // Fallback: look for any div with jsaction that contains note-like content
+        if (note === '') {
+            const jsActionDivs = itemDiv.querySelectorAll('div[jsaction]');
+            for (const div of jsActionDivs) {
+                // Skip if this is the button itself or contains the button
+                if (div.contains(button) || button.contains(div)) continue;
+                
+                const divText = div.textContent.trim();
+                if (divText && divText.length > 0) {
+                    const buttonText = button.textContent.trim().toLowerCase();
+                    // Check if this text is likely a note (not duplicate of button content)
+                    if (!buttonText.includes(divText.toLowerCase()) && 
+                        divText.length > 2 && 
+                        divText.length < 500) { // Reasonable note length
+                        note = divText.toLowerCase();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     if ((!name || name.length < 3) && typePrice.length > 0) {
       const parts = typePrice.split(/\s*·\s*|\s{2,}/);
       for (const part of parts) {
