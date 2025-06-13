@@ -1,6 +1,9 @@
 let lastQuery = '';
 let lastExcludeQuery = [];
 
+// Track fully loaded lists by their identifier
+let fullyLoadedLists = new Set();
+
 function removeDiacritics(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
@@ -272,6 +275,9 @@ function autoScrollListToLoadAll(callback, maxTries = 20, isReload = false) {
           sameCount++;
           scrollStep();
         } else {
+          // Mark this list as fully loaded
+          markListAsFullyLoaded();
+          
           // Show success message briefly before hiding
           showSuccessMessage(isReload);
           setTimeout(() => {
@@ -335,6 +341,46 @@ function waitForListToLoad() {
   }, 1000);
 }
 
+// Helper function to check if the list is already fully loaded
+function isListFullyLoaded() {
+  const listContainer = document.querySelector('div[role="main"]');
+  if (!listContainer) return false;
+  
+  // Get current list identifier
+  const listId = getListIdentifier(listContainer);
+  
+  // Check if we've already marked this list as fully loaded
+  if (fullyLoadedLists.has(listId)) {
+    console.log('List already marked as fully loaded:', listId);
+    return true;
+  }
+  
+  // Check if Google Maps is still showing loading indicators
+  const hasLoadingSpinner = document.querySelector('.loading, [data-value="Loading"], .spinner');
+  if (hasLoadingSpinner) {
+    return false;
+  }
+  
+  // Check if the scrollable container can be scrolled more
+  const scrollable = getScrollableListContainer();
+  if (!scrollable) return false;
+  
+  // If we can't scroll down more, the list is likely fully loaded
+  const canScrollMore = scrollable.scrollTop + scrollable.clientHeight < scrollable.scrollHeight - 10;
+  
+  return !canScrollMore;
+}
+
+// Helper function to mark a list as fully loaded
+function markListAsFullyLoaded() {
+  const listContainer = document.querySelector('div[role="main"]');
+  if (listContainer) {
+    const listId = getListIdentifier(listContainer);
+    fullyLoadedLists.add(listId);
+    console.log('Marked list as fully loaded:', listId);
+  }
+}
+
 function monitorUrlChanges() {
   let lastUrl = window.location.href;
   let urlCheckInterval;
@@ -347,16 +393,35 @@ function monitorUrlChanges() {
       console.log('URL changed, checking for list navigation...');
       lastUrl = currentUrl;
       
+      // Clear the fully loaded cache when navigating to a potentially different list
+      // We'll re-evaluate if the new list is loaded
+      const currentListContainer = document.querySelector('div[role="main"]');
+      if (currentListContainer) {
+        const currentListId = getListIdentifier(currentListContainer);
+        // Only clear if we're navigating to a different list
+        if (!fullyLoadedLists.has(currentListId)) {
+          fullyLoadedLists.clear();
+          console.log('Cleared fully loaded lists cache for new navigation');
+        }
+      }
+      
       // Small delay to let the new content load
       setTimeout(() => {
         const listContainer = document.querySelector('div[role="main"]');
         
         // Only auto-scroll if we're viewing actual list contents (not overview)
         if (listContainer && !isListOverviewPage() && hasPlaceContent(listContainer)) {
-          console.log('List content detected, starting auto-scroll...');
-          autoScrollListToLoadAll(() => {
+          // Check if the list is already fully loaded
+          if (isListFullyLoaded()) {
+            console.log('List is already fully loaded, skipping auto-scroll');
+            // Just apply filters without scrolling
             filterPlaces(lastQuery, lastExcludeQuery);
-          }, 20, true); // isReload = true
+          } else {
+            console.log('List content detected, starting auto-scroll...');
+            autoScrollListToLoadAll(() => {
+              filterPlaces(lastQuery, lastExcludeQuery);
+            }, 20, true); // isReload = true
+          }
         } else {
           console.log('Lists overview page detected, skipping auto-scroll');
         }
