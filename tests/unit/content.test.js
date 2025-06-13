@@ -320,7 +320,7 @@ describe('Content Script Unit Tests', () => {
 
     test('should handle diacritics in query and item text', () => {
       // Create item without using the helper's note functionality, then add note manually
-      const item1 = createPlaceItem('item1', 'Café Olé', 'Spanish Bistro', null); 
+      const item1 = createPlaceItem('item1', 'Café Olé', 'Spanish Bistro', null);
       const noteEl = document.createElement('div');
       noteEl.textContent = 'Serves Pâtisserie';
       noteEl.className = 'item-note'; // Added class for detection
@@ -329,12 +329,31 @@ describe('Content Script Unit Tests', () => {
 
       filterPlaces('cafe ole');
       expect(item1.style.display).toBe('');
-      
+
       filterPlaces('patisserie');
       expect(item1.style.display).toBe('');
-      
+
       filterPlaces('bistro');
       expect(item1.style.display).toBe('');
+    });
+
+    test('should extract textarea content for filtering', () => {
+      const itemDiv = document.createElement('div');
+      const button = document.createElement('button');
+      button.innerHTML = '<img src="fake.jpg"><h3 class="fontHeadlineSmall">Veg Stall</h3>';
+      itemDiv.appendChild(button);
+      const noteContainer = document.createElement('div');
+      const textarea = document.createElement('textarea');
+      textarea.value = 'indian vege \ud83d\ude05';
+      noteContainer.appendChild(textarea);
+      itemDiv.appendChild(noteContainer);
+      listContainer.appendChild(itemDiv);
+
+      filterPlaces('indian');
+      expect(itemDiv.style.display).toBe('');
+
+      filterPlaces('', ['indian']);
+      expect(itemDiv.style.display).toBe('none');
     });
 
     test('should correctly identify parent div for hiding/showing complex structures', () => {
