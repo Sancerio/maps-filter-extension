@@ -24,9 +24,16 @@ function extractAllText(element) {
       const alt = el.getAttribute && el.getAttribute('alt');
       const aria = el.getAttribute && el.getAttribute('aria-label');
       const title = el.getAttribute && el.getAttribute('title');
+      const placeholder = el.getAttribute && el.getAttribute('placeholder');
       if (alt) text += ' ' + alt.trim();
       if (aria) text += ' ' + aria.trim();
       if (title) text += ' ' + title.trim();
+      if (placeholder) text += ' ' + placeholder.trim();
+
+      // Include textarea value because user text may not appear as a text node
+      if (el.tagName === 'TEXTAREA' && typeof el.value === 'string') {
+        text += ' ' + el.value.trim();
+      }
     }
   }
   return text.toLowerCase().replace(/\s+/g, ' ').trim();
@@ -164,7 +171,12 @@ function filterPlaces(query, excludeQuery = []) {
 
     let itemText = extractAllText(itemDiv);
     const sibling = itemDiv.nextElementSibling;
-    if (sibling && sibling.matches('div.item-note, span.item-note, div[class*="note"], span[class*="note"]')) {
+    if (
+      sibling && (
+        sibling.matches('div.item-note, span.item-note, div[class*="note"], span[class*="note"]') ||
+        sibling.querySelector('textarea')
+      )
+    ) {
       itemText += ' ' + extractAllText(sibling);
     }
 
