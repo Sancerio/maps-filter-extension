@@ -112,6 +112,7 @@ maps-filter-extension/
 │   ├── icon_16x16.png
 │   ├── icon_48x48.png
 │   └── icon_128x128.png
+├── package.sh         # Version bump + packaging wrapper
 ├── scripts/           # Build and utility scripts
 │   └── pack.sh        # Distribution packaging script
 ├── tests/             # Test suite
@@ -124,14 +125,14 @@ maps-filter-extension/
 
 ### Building for Distribution
 ```bash
-# Make sure the pack script is executable
-chmod +x scripts/pack.sh
+# Make sure the package script is executable
+chmod +x package.sh
 
-# Create a distribution package
-./scripts/pack.sh
+# Create a distribution package (automatically bumps the version)
+./package.sh
 ```
 
-This creates a `google-maps-list-filter-v1.0.zip` file ready for store submission.
+This creates a `google-maps-list-filter-v<version>.zip` file ready for store submission.
 
 ## 🧪 Testing
 
