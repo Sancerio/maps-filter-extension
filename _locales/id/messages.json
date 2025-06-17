@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Filter Daftar Google Maps"},
+  "extensionDescription": {"message": "Cari dan saring tempat yang disimpan di daftar Google Maps dengan mudah berdasarkan nama, jenis, harga, atau catatan menggunakan kotak pencarian yang praktis"},
+  "extensionActionTitle": {"message": "Filter Maps"},
+  "filterPlaceholder": {"message": "Saring tempat berdasarkan nama, jenis, harga, atau catatan..."},
+  "hintExclude": {"message": "Tip: gunakan -kata untuk mengecualikan"},
+  "exampleLine": {"message": "Contoh: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Memuat semua tempat..."},
+  "loadingNewList": {"message": "Memuat daftar baru..."},
+  "loadingPlacesProgress": {"message": "Memuat tempat... ($1 ditemukan)"},
+  "allPlacesLoaded": {"message": "Semua tempat telah dimuat!"},
+  "newListLoaded": {"message": "Daftar baru dimuat!"}
+}

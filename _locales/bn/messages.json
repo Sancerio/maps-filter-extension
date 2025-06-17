@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "গুগল ম্যাপস তালিকা ফিল্টার"},
+  "extensionDescription": {"message": "সুবিধাজনক সার্চ বক্স দিয়ে নাম, ধরন, দাম বা নোট অনুযায়ী গুগল ম্যাপসের তালিকায় সংরক্ষিত স্থান সহজে খুঁজুন ও ফিল্টার করুন"},
+  "extensionActionTitle": {"message": "ম্যাপস ফিল্টার"},
+  "filterPlaceholder": {"message": "নাম, ধরন, দাম বা নোট দিয়ে স্থান ফিল্টার করুন..."},
+  "hintExclude": {"message": "ইঙ্গিত: বাদ দিতে -শব্দ ব্যবহার করুন"},
+  "exampleLine": {"message": "উদাহরণ: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "সব স্থান লোড হচ্ছে..."},
+  "loadingNewList": {"message": "নতুন তালিকা লোড হচ্ছে..."},
+  "loadingPlacesProgress": {"message": "স্থান লোড হচ্ছে... ($1টি পাওয়া গেছে)"},
+  "allPlacesLoaded": {"message": "সব স্থান লোড সম্পন্ন!"},
+  "newListLoaded": {"message": "নতুন তালিকা লোড সম্পন্ন!"}
+}

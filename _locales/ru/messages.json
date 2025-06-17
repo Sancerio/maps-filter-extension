@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Фильтр списков Google Карт"},
+  "extensionDescription": {"message": "Удобно ищите и фильтруйте сохранённые места в списках Google Карт по названию, типу, цене или заметкам"},
+  "extensionActionTitle": {"message": "Фильтр карт"},
+  "filterPlaceholder": {"message": "Фильтровать места по названию, типу, цене или заметкам..."},
+  "hintExclude": {"message": "Подсказка: используйте -слово для исключения"},
+  "exampleLine": {"message": "Примеры: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Загрузка всех мест..."},
+  "loadingNewList": {"message": "Загрузка нового списка..."},
+  "loadingPlacesProgress": {"message": "Загрузка мест... (найдено: $1)"},
+  "allPlacesLoaded": {"message": "Все места загружены!"},
+  "newListLoaded": {"message": "Новый список загружен!"}
+}

@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "구글 지도 목록 필터"},
+  "extensionDescription": {"message": "편리한 검색 상자를 사용하여 이름, 유형, 가격 또는 메모로 구글 지도 목록에 저장된 장소를 쉽게 검색하고 필터링하세요"},
+  "extensionActionTitle": {"message": "지도 필터"},
+  "filterPlaceholder": {"message": "이름, 유형, 가격 또는 메모로 장소 필터..."},
+  "hintExclude": {"message": "팁: 제외하려면 -단어 사용"},
+  "exampleLine": {"message": "예: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "모든 장소 불러오는 중..."},
+  "loadingNewList": {"message": "새 목록 불러오는 중..."},
+  "loadingPlacesProgress": {"message": "장소 불러오는 중... ($1개 찾음)"},
+  "allPlacesLoaded": {"message": "모든 장소를 불러왔습니다!"},
+  "newListLoaded": {"message": "새 목록을 불러왔습니다!"}
+}

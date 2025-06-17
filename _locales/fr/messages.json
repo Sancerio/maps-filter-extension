@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Filtre de listes Google Maps"},
+  "extensionDescription": {"message": "Recherchez et filtrez facilement vos lieux enregistrés dans les listes Google Maps par nom, type, prix ou notes grâce à une zone de recherche pratique"},
+  "extensionActionTitle": {"message": "Filtre Maps"},
+  "filterPlaceholder": {"message": "Filtrer les lieux par nom, type, prix ou notes..."},
+  "hintExclude": {"message": "Astuce : utilisez -mot pour exclure"},
+  "exampleLine": {"message": "Exemples : \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Chargement de tous les lieux..."},
+  "loadingNewList": {"message": "Chargement de la nouvelle liste..."},
+  "loadingPlacesProgress": {"message": "Chargement des lieux... ($1 trouvés)"},
+  "allPlacesLoaded": {"message": "Tous les lieux chargés !"},
+  "newListLoaded": {"message": "Nouvelle liste chargée !"}
+}

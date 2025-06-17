@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google Maps జాబితా ఫిల్టర్"},
+  "extensionDescription": {"message": "సౌకర్యవంతమైన శోధన బాక్స్ ద్వారా పేరు, రకం, ధర లేదా గమనికల ఆధారంగా Google Maps జాబితాల్లో మీరు సేవ్ చేసిన ప్రదేశాలను సులభంగా శోధించి ఫిల్టర్ చేయండి"},
+  "extensionActionTitle": {"message": "మ్యాప్‌లు ఫిల్టర్"},
+  "filterPlaceholder": {"message": "పేరు, రకం, ధర లేదా గమనికల ద్వారా ప్రదేశాలను వడపోసు..."},
+  "hintExclude": {"message": "సూచన: తొలగించడానికి -పదాన్ని ఉపయోగించండి"},
+  "exampleLine": {"message": "ఉదాహరణలు: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "అన్ని ప్రదేశాలు లోడ్ అవుతున్నాయి..."},
+  "loadingNewList": {"message": "కొత్త జాబితా లోడ్ అవుతోంది..."},
+  "loadingPlacesProgress": {"message": "ప్రదేశాలు లోడ్ అవుతున్నాయి... ($1 కనుగొనబడింది)"},
+  "allPlacesLoaded": {"message": "అన్ని ప్రదేశాలు లోడ్ అయ్యాయి!"},
+  "newListLoaded": {"message": "కొత్త జాబితా లోడ్ అయింది!"}
+}

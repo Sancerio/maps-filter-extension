@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google マップ リストフィルター"},
+  "extensionDescription": {"message": "便利な検索ボックスで名前、種類、価格、メモから Google マップの保存済みリストを簡単に検索・フィルタリング"},
+  "extensionActionTitle": {"message": "マップフィルター"},
+  "filterPlaceholder": {"message": "名前、種類、価格、メモで場所を絞り込み..."},
+  "hintExclude": {"message": "ヒント: 除外するには -単語 を使用"},
+  "exampleLine": {"message": "例: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "すべての場所を読み込み中..."},
+  "loadingNewList": {"message": "新しいリストを読み込み中..."},
+  "loadingPlacesProgress": {"message": "場所を読み込み中...（$1 件）"},
+  "allPlacesLoaded": {"message": "すべての場所を読み込みました!"},
+  "newListLoaded": {"message": "新しいリストを読み込みました!"}
+}

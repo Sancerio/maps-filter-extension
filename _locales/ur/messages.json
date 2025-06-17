@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "گوگل میپس لسٹ فلٹر"},
+  "extensionDescription": {"message": "آسان سرچ باکس کے ذریعے نام، قسم، قیمت یا نوٹس کے حساب سے گوگل میپس کی فہرستوں میں محفوظ مقامات کو باآسانی تلاش کریں اور فلٹر کریں"},
+  "extensionActionTitle": {"message": "میپس فلٹر"},
+  "filterPlaceholder": {"message": "نام، قسم، قیمت یا نوٹس سے مقامات فلٹر کریں..."},
+  "hintExclude": {"message": "اشارہ: کسی لفظ کو نکالنے کے لیے -word استعمال کریں"},
+  "exampleLine": {"message": "مثالیں: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "تمام مقامات لوڈ ہو رہے ہیں..."},
+  "loadingNewList": {"message": "نئی فہرست لوڈ ہو رہی ہے..."},
+  "loadingPlacesProgress": {"message": "مقامات لوڈ ہو رہے ہیں... ($1 ملا)"},
+  "allPlacesLoaded": {"message": "تمام مقامات لوڈ ہو گئے!"},
+  "newListLoaded": {"message": "نئی فہرست لوڈ ہو گئی!"}
+}

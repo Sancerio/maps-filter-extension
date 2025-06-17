@@ -4,6 +4,29 @@ let lastExcludeQuery = [];
 // Track fully loaded lists by their identifier
 let fullyLoadedLists = new Set();
 
+const fallbackMessages = {
+  filterPlaceholder: 'Filter places by name, type, price, or notes...',
+  hintExclude: 'Hint: use -word to exclude',
+  exampleLine: 'Examples: "restaurant -expensive", "mala -✅"',
+  loadingAll: 'Loading all places...',
+  loadingNewList: 'Loading new list...',
+  loadingPlacesProgress: 'Loading places... ($1 found)',
+  allPlacesLoaded: 'All places loaded!',
+  newListLoaded: 'New list loaded!'
+};
+
+function i18n(key, substitutions) {
+  if (typeof chrome !== 'undefined' && chrome.i18n && chrome.i18n.getMessage) {
+    return chrome.i18n.getMessage(key, substitutions);
+  }
+  const msg = fallbackMessages[key];
+  if (!msg) return '';
+  if (Array.isArray(substitutions)) {
+    return msg.replace('$1', substitutions[0]);
+  }
+  return msg;
+}
+
 function removeDiacritics(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
@@ -112,16 +135,12 @@ function injectFilterUI() {
   const container = document.createElement('div');
   container.id = 'maps-list-filter';
   container.innerHTML = `
-    <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes..." />
-    <div class="filter-examples">
-      Hint: use -word to exclude
-    </div>
-    <div class="filter-examples">
-      Examples: "restaurant -expensive", "mala -✅"
-    </div>
+    <input type="text" id="maps-filter-input" placeholder="${i18n('filterPlaceholder')}" />
+    <div class="filter-examples">${i18n('hintExclude')}</div>
+    <div class="filter-examples">${i18n('exampleLine')}</div>
     <div id="loading-indicator" class="loading-state" style="display: none;">
       <div class="loading-spinner"></div>
-      <span>Loading all places...</span>
+      <span>${i18n('loadingAll')}</span>
     </div>
   `;
   document.body.appendChild(container);
@@ -242,7 +261,7 @@ function getScrollableListContainer() {
 function autoScrollListToLoadAll(callback, maxTries = 20, isReload = false) {
   // Show loading with appropriate message
   if (isReload) {
-    showLoadingState('Loading new list...');
+    showLoadingState(i18n('loadingNewList'));
   } else {
     showLoadingState();
   }
@@ -307,7 +326,7 @@ function updateLoadingProgress() {
     
     const loadingText = loadingIndicator.querySelector('span');
     if (loadingText) {
-      loadingText.textContent = `Loading places... (${placeButtons.length} found)`;
+      loadingText.textContent = i18n('loadingPlacesProgress', [placeButtons.length]);
     }
   }
 }
@@ -439,8 +458,8 @@ function showLoadingState(customMessage = null) {
   const loadingIndicator = document.getElementById('loading-indicator');
   if (loadingIndicator) {
     const loadingText = loadingIndicator.querySelector('span');
-    if (loadingText && customMessage) {
-      loadingText.textContent = customMessage;
+    if (loadingText) {
+      loadingText.textContent = customMessage || i18n('loadingAll');
     }
     loadingIndicator.style.display = 'flex';
   }
@@ -459,7 +478,7 @@ function hideLoadingState() {
       loadingSpinner.style.display = 'block'; // Show spinner for next time
     }
     if (loadingText) {
-      loadingText.textContent = 'Loading all places...'; // Reset default text
+      loadingText.textContent = i18n('loadingAll'); // Reset default text
     }
     
     // Remove success class
@@ -474,7 +493,7 @@ function showSuccessMessage(isReload = false) {
     const loadingText = loadingIndicator.querySelector('span');
     
     if (loadingText) {
-      loadingText.textContent = isReload ? 'New list loaded!' : 'All places loaded!';
+      loadingText.textContent = isReload ? i18n('newListLoaded') : i18n('allPlacesLoaded');
     }
     
     // Add success class for styling

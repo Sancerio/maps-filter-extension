@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Kichujio cha Orodha za Google Maps"},
+  "extensionDescription": {"message": "Tafuta na uchuje kwa urahisi maeneo uliyo hifadhi katika orodha za Google Maps kwa jina, aina, bei au maelezo ukitumia kisanduku cha utafutaji rahisi"},
+  "extensionActionTitle": {"message": "Kichujio cha Ramani"},
+  "filterPlaceholder": {"message": "Chuja maeneo kwa jina, aina, bei au maelezo..."},
+  "hintExclude": {"message": "Dokezo: tumia -neno kuondoa"},
+  "exampleLine": {"message": "Mifano: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Inapakia maeneo yote..."},
+  "loadingNewList": {"message": "Inapakia orodha mpya..."},
+  "loadingPlacesProgress": {"message": "Inapakia maeneo... ($1 yamepatikana)"},
+  "allPlacesLoaded": {"message": "Maeneo yote yamepakiwa!"},
+  "newListLoaded": {"message": "Orodha mpya imepakiwa!"}
+}
