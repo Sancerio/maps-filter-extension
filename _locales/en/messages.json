@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google Maps List Filter"},
+  "extensionDescription": {"message": "Easily search and filter your saved places in Google Maps lists by name, type, price, or notes with a convenient search overlay"},
+  "extensionActionTitle": {"message": "Maps Filter"},
+  "filterPlaceholder": {"message": "Filter places by name, type, price, or notes..."},
+  "hintExclude": {"message": "Hint: use -word to exclude"},
+  "exampleLine": {"message": "Examples: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Loading all places..."},
+  "loadingNewList": {"message": "Loading new list..."},
+  "loadingPlacesProgress": {"message": "Loading places... ($1 found)"},
+  "allPlacesLoaded": {"message": "All places loaded!"},
+  "newListLoaded": {"message": "New list loaded!"}
+}

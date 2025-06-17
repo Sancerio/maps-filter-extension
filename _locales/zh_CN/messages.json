@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google 地图列表筛选器"},
+  "extensionDescription": {"message": "通过便捷的搜索框，按名称、类别、价格或备注轻松搜索和筛选你在 Google 地图列表中保存的地点"},
+  "extensionActionTitle": {"message": "地图筛选"},
+  "filterPlaceholder": {"message": "按名称、类别、价格或备注筛选地点..."},
+  "hintExclude": {"message": "提示：用 -单词 排除"},
+  "exampleLine": {"message": "示例：\"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "正在加载所有地点..."},
+  "loadingNewList": {"message": "正在加载新列表..."},
+  "loadingPlacesProgress": {"message": "正在加载地点...（已找到 $1 个）"},
+  "allPlacesLoaded": {"message": "所有地点已加载！"},
+  "newListLoaded": {"message": "新列表已加载！"}
+}

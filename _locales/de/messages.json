@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google-Maps-Listenfilter"},
+  "extensionDescription": {"message": "Durchsuchen und filtern Sie Ihre gespeicherten Orte in Google-Maps-Listen bequem nach Name, Typ, Preis oder Notizen über ein praktisches Suchfeld"},
+  "extensionActionTitle": {"message": "Maps-Filter"},
+  "filterPlaceholder": {"message": "Orte nach Name, Typ, Preis oder Notizen filtern..."},
+  "hintExclude": {"message": "Tipp: Verwende -Wort, um auszuschließen"},
+  "exampleLine": {"message": "Beispiele: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Alle Orte werden geladen..."},
+  "loadingNewList": {"message": "Neue Liste wird geladen..."},
+  "loadingPlacesProgress": {"message": "Orte werden geladen... ($1 gefunden)"},
+  "allPlacesLoaded": {"message": "Alle Orte geladen!"},
+  "newListLoaded": {"message": "Neue Liste geladen!"}
+}

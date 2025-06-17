@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google Haritalar Liste Filtresi"},
+  "extensionDescription": {"message": "Kullanışlı bir arama kutusuyla isim, tür, fiyat veya notlara göre Google Haritalar listelerinizde kaydedilen yerleri kolayca arayın ve filtreleyin"},
+  "extensionActionTitle": {"message": "Harita Filtresi"},
+  "filterPlaceholder": {"message": "Yerleri isme, türe, fiyata veya notlara göre filtrele..."},
+  "hintExclude": {"message": "İpucu: hariç tutmak için -kelime kullanın"},
+  "exampleLine": {"message": "Örnekler: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Tüm yerler yükleniyor..."},
+  "loadingNewList": {"message": "Yeni liste yükleniyor..."},
+  "loadingPlacesProgress": {"message": "Yerler yükleniyor... ($1 bulundu)"},
+  "allPlacesLoaded": {"message": "Tüm yerler yüklendi!"},
+  "newListLoaded": {"message": "Yeni liste yüklendi!"}
+}

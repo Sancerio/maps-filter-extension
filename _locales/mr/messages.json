@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google Maps सूची फिल्टर"},
+  "extensionDescription": {"message": "सोयीच्या शोध बॉक्सद्वारे नाव, प्रकार, किंमत किंवा नोंदींनुसार Google Maps याद्यांमधील जतन केलेली ठिकाणे सहज शोधा आणि फिल्टर करा"},
+  "extensionActionTitle": {"message": "नकाशे फिल्टर"},
+  "filterPlaceholder": {"message": "नाव, प्रकार, किंमत किंवा नोंदींवरून ठिकाणे फिल्टर करा..."},
+  "hintExclude": {"message": "सूचना: वगळण्यासाठी -शब्द वापरा"},
+  "exampleLine": {"message": "उदाहरणे: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "सर्व ठिकाणे लोड होत आहेत..."},
+  "loadingNewList": {"message": "नवीन यादी लोड होत आहे..."},
+  "loadingPlacesProgress": {"message": "ठिकाणे लोड होत आहेत... ($1 आढळले)"},
+  "allPlacesLoaded": {"message": "सर्व ठिकाणे लोड झाली!"},
+  "newListLoaded": {"message": "नवीन यादी लोड झाली!"}
+}

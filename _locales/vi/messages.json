@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Bộ lọc danh sách Google Maps"},
+  "extensionDescription": {"message": "Tìm kiếm và lọc các địa điểm đã lưu trong danh sách Google Maps theo tên, loại, giá hoặc ghi chú một cách dễ dàng bằng hộp tìm kiếm tiện lợi"},
+  "extensionActionTitle": {"message": "Bộ lọc Maps"},
+  "filterPlaceholder": {"message": "Lọc địa điểm theo tên, loại, giá hoặc ghi chú..."},
+  "hintExclude": {"message": "Mẹo: dùng -từ để loại bỏ"},
+  "exampleLine": {"message": "Ví dụ: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "Đang tải tất cả địa điểm..."},
+  "loadingNewList": {"message": "Đang tải danh sách mới..."},
+  "loadingPlacesProgress": {"message": "Đang tải địa điểm... (đã tìm thấy $1)"},
+  "allPlacesLoaded": {"message": "Đã tải xong tất cả địa điểm!"},
+  "newListLoaded": {"message": "Đã tải xong danh sách mới!"}
+}

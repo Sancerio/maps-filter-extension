@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "مرشح قوائم خرائط Google"},
+  "extensionDescription": {"message": "ابحث وفلتر أماكنك المحفوظة في قوائم خرائط Google بسهولة حسب الاسم أو النوع أو السعر أو الملاحظات باستخدام مربع بحث ملائم"},
+  "extensionActionTitle": {"message": "مرشح الخرائط"},
+  "filterPlaceholder": {"message": "فرز الأماكن حسب الاسم أو النوع أو السعر أو الملاحظات..."},
+  "hintExclude": {"message": "تلميح: استخدم ‎-كلمة لاستبعادها"},
+  "exampleLine": {"message": "أمثلة: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "جاري تحميل جميع الأماكن..."},
+  "loadingNewList": {"message": "جاري تحميل القائمة الجديدة..."},
+  "loadingPlacesProgress": {"message": "جاري تحميل الأماكن... (تم العثور على ‎$1)"},
+  "allPlacesLoaded": {"message": "تم تحميل كل الأماكن!"},
+  "newListLoaded": {"message": "تم تحميل القائمة الجديدة!"}
+}

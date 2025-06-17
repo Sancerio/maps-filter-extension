@@ -1,0 +1,13 @@
+{
+  "extensionName": {"message": "Google Maps सूची फ़िल्टर"},
+  "extensionDescription": {"message": "सुविधाजनक खोज बॉक्स से नाम, प्रकार, कीमत या नोट्स के अनुसार Google Maps सूचियों में सेव किए गए स्थानों को आसानी से खोजें और फ़िल्टर करें"},
+  "extensionActionTitle": {"message": "मैप्स फ़िल्टर"},
+  "filterPlaceholder": {"message": "नाम, प्रकार, कीमत या नोट्स से स्थान फ़िल्टर करें..."},
+  "hintExclude": {"message": "सुझाव: किसी शब्द को हटाने के लिए -word प्रयोग करें"},
+  "exampleLine": {"message": "उदाहरण: \"restaurant -expensive\", \"mala -✅\""},
+  "loadingAll": {"message": "सभी स्थान लोड हो रहे हैं..."},
+  "loadingNewList": {"message": "नई सूची लोड हो रही है..."},
+  "loadingPlacesProgress": {"message": "स्थान लोड हो रहे हैं... ($1 मिले)"},
+  "allPlacesLoaded": {"message": "सभी स्थान लोड हो गए!"},
+  "newListLoaded": {"message": "नई सूची लोड हो गई!"}
+}
