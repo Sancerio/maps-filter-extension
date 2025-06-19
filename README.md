@@ -199,7 +199,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🐛 Known Issues & Limitations
 
-- Works only on `google.com/maps` domain
+- Works on any Google Maps domain, such as `google.co.uk/maps`
 - Requires lists to be fully loaded (extension auto-loads them)
 - Some very old Google Maps layouts may not be supported
 - Auto-scroll only triggers for actual list content, not list overview pages
