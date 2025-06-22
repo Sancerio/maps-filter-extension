@@ -112,16 +112,25 @@ function injectFilterUI() {
   const container = document.createElement('div');
   container.id = 'maps-list-filter';
   container.innerHTML = `
-    <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes..." />
-    <div class="filter-examples">
-      Hint: use -word to exclude
+    <div class="filter-content">
+      <button id="collapse-filter" class="collapse-button" aria-label="Hide filter">×</button>
+      <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes..." />
+      <div class="filter-examples">
+        Hint: use -word to exclude
+      </div>
+      <div class="filter-examples">
+        Examples: "restaurant -expensive", "mala -✅"
+      </div>
+      <div id="loading-indicator" class="loading-state" style="display: none;">
+        <div class="loading-spinner"></div>
+        <span>Loading all places...</span>
+      </div>
     </div>
-    <div class="filter-examples">
-      Examples: "restaurant -expensive", "mala -✅"
-    </div>
-    <div id="loading-indicator" class="loading-state" style="display: none;">
-      <div class="loading-spinner"></div>
-      <span>Loading all places...</span>
+    <div id="maps-filter-toggle" aria-label="Show filter">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="10" cy="10" r="6" stroke="#5f6368" stroke-width="2" fill="none"></circle>
+        <line x1="14.5" y1="14.5" x2="20" y2="20" stroke="#5f6368" stroke-width="2"></line>
+      </svg>
     </div>
   `;
   document.body.appendChild(container);
@@ -133,6 +142,23 @@ function injectFilterUI() {
     lastExcludeQuery = excludeTerms.map(term => term.toLowerCase());
     filterPlaces(lastQuery, lastExcludeQuery);
   });
+
+  document.getElementById('collapse-filter').addEventListener('click', collapseFilterUI);
+  document.getElementById('maps-filter-toggle').addEventListener('click', expandFilterUI);
+}
+
+function collapseFilterUI() {
+  const container = document.getElementById('maps-list-filter');
+  if (container) {
+    container.classList.add('collapsed');
+  }
+}
+
+function expandFilterUI() {
+  const container = document.getElementById('maps-list-filter');
+  if (container) {
+    container.classList.remove('collapsed');
+  }
 }
 
 function parseSearchInput(input) {
