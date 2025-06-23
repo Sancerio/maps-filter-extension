@@ -1,6 +1,6 @@
 {
   "name": "maps-filter-extension",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "content.js",
   "scripts": {
