@@ -64,6 +64,29 @@ describe('Content Script Unit Tests', () => {
     // Indicate a test environment to prevent auto-execution of some script parts
     window.__TEST_ENV__ = true;
 
+    // Mock Chrome APIs
+    const mockChrome = {
+      storage: {
+        local: {
+          get: jest.fn((keys, callback) => {
+            // Return empty result by default
+            callback({});
+          }),
+          set: jest.fn((data, callback) => {
+            if (callback) callback();
+          })
+        }
+      },
+      runtime: {
+        getURL: jest.fn((path) => `chrome-extension://test-extension-id/${path}`),
+        id: 'test-extension-id'
+      }
+    };
+    
+    // Set up chrome global
+    window.chrome = mockChrome;
+    global.chrome = mockChrome;
+
     // Execute the content script in the JSDOM context
     const scriptEl = window.document.createElement('script');
     scriptEl.textContent = contentScript;
