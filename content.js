@@ -113,8 +113,27 @@ function injectFilterUI() {
   container.id = 'maps-list-filter';
   container.innerHTML = `
     <div class="filter-content">
-      <button id="collapse-filter" class="collapse-button" aria-label="Hide filter">×</button>
-      <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes..." />
+      <div class="input-wrapper" style="position:relative;">
+        <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes..." />
+        <button id="collapse-filter" class="collapse-button" aria-label="Hide filter">
+          <svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true">
+          <path d="M2.1 12c2.3-4.3 6.2-7 9.9-7s7.6 2.7 9.9 7c-2.3 4.3-6.2 7-9.9 7S4.4 16.3 2.1 12z"/>
+          <circle cx="12" cy="12" r="3.5"/>
+          <line x1="3" y1="3" x2="21" y2="21"/>
+
+        </svg>
+
+        </button>
+      </div>
       <div class="filter-examples">
         Hint: use -word to exclude
       </div>
@@ -127,13 +146,48 @@ function injectFilterUI() {
       </div>
     </div>
     <div id="maps-filter-toggle" aria-label="Show filter">
-      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="10" cy="10" r="6" stroke="#5f6368" stroke-width="2" fill="none"></circle>
-        <line x1="14.5" y1="14.5" x2="20" y2="20" stroke="#5f6368" stroke-width="2"></line>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="#5f6368" aria-hidden="true">
+        <path d="M1.5 1.5h13l-4 4v6l-5 2v-8l-4-4z"/>
       </svg>
     </div>
   `;
   document.body.appendChild(container);
+
+  // Restore last state from chrome.storage.local
+  chrome.storage && chrome.storage.local.get(['mapsFilterCollapsed'], (result) => {
+    if (result.mapsFilterCollapsed === true) {
+      container.classList.add('collapsed');
+    }
+  });
+
+  // Set the extension icon for the toggle button
+  const toggleButton = document.getElementById('maps-filter-toggle');
+  if (chrome.runtime && chrome.runtime.getURL) {
+    const iconUrl = chrome.runtime.getURL('icons/icon_48x48.png');
+    console.log('Attempting to load extension icon from:', iconUrl);
+    
+    // Create an image to test if the icon loads properly
+    const testImage = new Image();
+    testImage.onload = function() {
+      // Icon loaded successfully, set it as background and remove SVG
+      console.log('Extension icon loaded successfully');
+      toggleButton.style.backgroundImage = `url(${iconUrl})`;
+      toggleButton.style.backgroundSize = '20px 20px';
+      toggleButton.style.backgroundPosition = 'center';
+      toggleButton.style.backgroundRepeat = 'no-repeat';
+      const svgIcon = toggleButton.querySelector('svg');
+      if (svgIcon) {
+        svgIcon.remove();
+      }
+    };
+    testImage.onerror = function() {
+      // Icon failed to load, keep the SVG fallback
+      console.log('Extension icon failed to load, using SVG fallback');
+    };
+    testImage.src = iconUrl;
+  } else {
+    console.log('Chrome runtime not available, using SVG fallback');
+  }
 
   document.getElementById('maps-filter-input').addEventListener('input', (e) => {
     const input = e.target.value;
@@ -151,6 +205,9 @@ function collapseFilterUI() {
   const container = document.getElementById('maps-list-filter');
   if (container) {
     container.classList.add('collapsed');
+    if (chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ mapsFilterCollapsed: true });
+    }
   }
 }
 
@@ -158,6 +215,9 @@ function expandFilterUI() {
   const container = document.getElementById('maps-list-filter');
   if (container) {
     container.classList.remove('collapsed');
+    if (chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({ mapsFilterCollapsed: false });
+    }
   }
 }
 

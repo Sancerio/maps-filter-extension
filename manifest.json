@@ -3,7 +3,9 @@
   "name": "Google Maps List Filter",
   "version": "1.0.2",
   "description": "Easily search and filter your saved places in Google Maps lists by name, type, price, or notes with a convenient search overlay",
-  "permissions": [],
+  "permissions": [
+    "storage"
+  ],
   "icons": {
     "16": "icons/icon_16x16.png",
     "48": "icons/icon_48x48.png",
@@ -83,5 +85,71 @@
   ],
   "action": {
     "default_title": "Maps Filter"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.png"],
+      "matches": [
+        "https://www.google.com/*",
+        "https://google.com/*",
+        "https://www.google.co.uk/*",
+        "https://www.google.ca/*",
+        "https://www.google.com.au/*",
+        "https://www.google.de/*",
+        "https://www.google.fr/*",
+        "https://www.google.es/*",
+        "https://www.google.it/*",
+        "https://www.google.co.jp/*",
+        "https://www.google.co.in/*",
+        "https://www.google.com.br/*",
+        "https://www.google.nl/*",
+        "https://www.google.com.mx/*",
+        "https://www.google.com.tr/*",
+        "https://www.google.be/*",
+        "https://www.google.dk/*",
+        "https://www.google.com.ar/*",
+        "https://www.google.ch/*",
+        "https://www.google.cl/*",
+        "https://www.google.at/*",
+        "https://www.google.co.kr/*",
+        "https://www.google.ie/*",
+        "https://www.google.com.co/*",
+        "https://www.google.pl/*",
+        "https://www.google.pt/*",
+        "https://www.google.com.pk/*",
+        "https://www.google.ru/*",
+        "https://www.google.com.tw/*",
+        "https://www.google.com.hk/*",
+        "https://www.google.com.sg/*",
+        "https://www.google.co.za/*",
+        "https://www.google.com.my/*",
+        "https://www.google.co.th/*",
+        "https://www.google.com.ph/*",
+        "https://www.google.com.vn/*",
+        "https://www.google.co.id/*",
+        "https://www.google.com.eg/*",
+        "https://www.google.com.sa/*",
+        "https://www.google.ae/*",
+        "https://www.google.com.ng/*",
+        "https://www.google.co.ke/*",
+        "https://www.google.com.pe/*",
+        "https://www.google.com.ec/*",
+        "https://www.google.com.ve/*",
+        "https://www.google.com.uy/*",
+        "https://www.google.com.py/*",
+        "https://www.google.com.bo/*",
+        "https://www.google.cz/*",
+        "https://www.google.sk/*",
+        "https://www.google.hu/*",
+        "https://www.google.hr/*",
+        "https://www.google.si/*",
+        "https://www.google.ro/*",
+        "https://www.google.bg/*",
+        "https://www.google.gr/*",
+        "https://www.google.se/*",
+        "https://www.google.no/*",
+        "https://www.google.fi/*"
+      ]
+    }
+  ]
 }

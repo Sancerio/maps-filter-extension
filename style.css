@@ -11,9 +11,15 @@
   transition: width 0.3s ease, height 0.3s ease, padding 0.3s ease;
 }
 
+.input-wrapper {
+  position: relative;
+  width: fit-content;
+  width: 100%;
+}
+
 #maps-filter-input {
   width: 280px;
-  padding: 10px 12px;
+  padding: 10px 36px 10px 12px;
   border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 14px;
@@ -80,19 +86,21 @@
 #maps-list-filter.collapsed {
   width: 48px;
   height: 48px;
-  padding: 8px;
+  padding: 0;
+  overflow: hidden;
 }
 
 .filter-content {
   display: flex;
   flex-direction: column;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   position: relative;
 }
 
 #maps-list-filter.collapsed .filter-content {
   opacity: 0;
   pointer-events: none;
+  transform: scale(0.8);
 }
 
 #maps-filter-toggle {
@@ -106,24 +114,87 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.3s ease;
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-blend-mode: normal;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#maps-filter-toggle:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%) scale(1.05);
 }
 
 #maps-list-filter.collapsed #maps-filter-toggle {
   display: flex;
+  animation: toggleAppear 0.3s ease;
+}
+
+#maps-filter-toggle svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+@keyframes toggleAppear {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(-90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
 }
 
 .collapse-button {
   position: absolute;
   top: 4px;
   right: 4px;
-  width: 20px;
-  height: 20px;
+  transform: none;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 50%;
-  background: transparent;
+  background: rgba(95, 99, 104, 0.08);
   color: #5f6368;
-  font-size: 16px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  z-index: 2;
+  padding: 0;
+}
+
+.collapse-button:hover {
+  background: rgba(95, 99, 104, 0.18);
+  color: #202124;
+  transform: translateY(-25%) scale(1.1);
+}
+
+.collapse-button:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.collapse-button svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+/* Remove the old X icon CSS */
+.collapse-button::before,
+.collapse-button::after {
+  display: none !important;
+  content: none !important;
 }
 
 #maps-list-filter.collapsed .collapse-button {
