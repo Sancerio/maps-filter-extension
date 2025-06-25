@@ -15,6 +15,7 @@ A browser extension that adds a powerful search and filter functionality to your
 - 🎨 **Clean UI**: Non-intrusive overlay that matches Google's design
 - ⚡ **Auto-loading**: Automatically loads all places in long lists
 - 📱 **Responsive**: Works seamlessly on different screen sizes
+- 🖱️ **Draggable UI**: Move the search box so it never blocks Maps controls
 - 🔄 **List Navigation**: Automatically reloads when switching between lists
 
 ## 🚀 Installation

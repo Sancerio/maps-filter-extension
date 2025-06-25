@@ -199,6 +199,9 @@ function injectFilterUI() {
 
   document.getElementById('collapse-filter').addEventListener('click', collapseFilterUI);
   document.getElementById('maps-filter-toggle').addEventListener('click', expandFilterUI);
+
+  // Enable dragging of the container so it can be moved around
+  makeDraggable(container);
 }
 
 function collapseFilterUI() {
@@ -219,6 +222,52 @@ function expandFilterUI() {
       chrome.storage.local.set({ mapsFilterCollapsed: false });
     }
   }
+}
+
+// Make an element draggable so users can reposition the filter UI
+function makeDraggable(el) {
+  let offsetX = 0;
+  let offsetY = 0;
+  let dragging = false;
+
+  const startDrag = (e) => {
+    // Don't start drag when interacting with inputs or non-toggle buttons
+    if (e.target.closest('input') ||
+        (e.target.closest('button') && !e.target.closest('#maps-filter-toggle')) ||
+        e.target.closest('textarea')) {
+      return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    offsetX = clientX - rect.left;
+    offsetY = clientY - rect.top;
+    dragging = true;
+
+    document.addEventListener(e.type === 'touchstart' ? 'touchmove' : 'mousemove', onMove);
+    document.addEventListener(e.type === 'touchstart' ? 'touchend' : 'mouseup', endDrag);
+  };
+
+  const onMove = (e) => {
+    if (!dragging) return;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    el.style.left = `${clientX - offsetX}px`;
+    el.style.top = `${clientY - offsetY}px`;
+    el.style.right = 'auto';
+  };
+
+  const endDrag = () => {
+    dragging = false;
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', endDrag);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', endDrag);
+  };
+
+  el.addEventListener('mousedown', startDrag);
+  el.addEventListener('touchstart', startDrag, { passive: true });
 }
 
 function parseSearchInput(input) {

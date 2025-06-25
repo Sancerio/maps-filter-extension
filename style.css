@@ -2,6 +2,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
+  left: auto;
   z-index: 10000;
   background: white;
   border-radius: 8px;
