@@ -154,9 +154,22 @@ function injectFilterUI() {
   document.body.appendChild(container);
 
   // Restore last state from chrome.storage.local
-  chrome.storage && chrome.storage.local.get(['mapsFilterCollapsed'], (result) => {
+  chrome.storage && chrome.storage.local.get([
+    'mapsFilterCollapsed',
+    'mapsFilterPosition'
+  ], (result) => {
     if (result.mapsFilterCollapsed === true) {
       container.classList.add('collapsed');
+    }
+    if (result.mapsFilterPosition) {
+      const { left, top } = result.mapsFilterPosition;
+      if (typeof left === 'number') {
+        container.style.left = `${left}px`;
+        container.style.right = 'auto';
+      }
+      if (typeof top === 'number') {
+        container.style.top = `${top}px`;
+      }
     }
   });
 
@@ -264,6 +277,11 @@ function makeDraggable(el) {
     document.removeEventListener('mouseup', endDrag);
     document.removeEventListener('touchmove', onMove);
     document.removeEventListener('touchend', endDrag);
+    if (chrome.storage && chrome.storage.local) {
+      const left = parseInt(el.style.left, 10);
+      const top = parseInt(el.style.top, 10);
+      chrome.storage.local.set({ mapsFilterPosition: { left, top } });
+    }
   };
 
   el.addEventListener('mousedown', startDrag);
