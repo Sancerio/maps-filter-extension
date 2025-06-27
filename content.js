@@ -242,50 +242,60 @@ function makeDraggable(el) {
   let offsetX = 0;
   let offsetY = 0;
   let dragging = false;
+  let moved = false;
 
   const startDrag = (e) => {
     // Don't start drag when interacting with inputs or non-toggle buttons
-    if (e.target.closest('input') ||
-        (e.target.closest('button') && !e.target.closest('#maps-filter-toggle')) ||
-        e.target.closest('textarea')) {
+    if (
+      e.target.closest('input') ||
+      (e.target.closest('button') && !e.target.closest('#maps-filter-toggle')) ||
+      e.target.closest('textarea')
+    ) {
       return;
     }
 
     const rect = el.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    offsetX = clientX - rect.left;
-    offsetY = clientY - rect.top;
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
     dragging = true;
+    moved = false;
 
-    document.addEventListener(e.type === 'touchstart' ? 'touchmove' : 'mousemove', onMove);
-    document.addEventListener(e.type === 'touchstart' ? 'touchend' : 'mouseup', endDrag);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', endDrag);
+    e.preventDefault();
   };
 
   const onMove = (e) => {
     if (!dragging) return;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    el.style.left = `${clientX - offsetX}px`;
-    el.style.top = `${clientY - offsetY}px`;
+    const newLeft = e.clientX - offsetX;
+    const newTop = e.clientY - offsetY;
+    if (Math.abs(newLeft - parseInt(el.style.left || 0, 10)) > 2 ||
+        Math.abs(newTop - parseInt(el.style.top || 0, 10)) > 2) {
+      moved = true;
+    }
+    el.style.left = `${newLeft}px`;
+    el.style.top = `${newTop}px`;
     el.style.right = 'auto';
+    e.preventDefault();
   };
 
-  const endDrag = () => {
+  const endDrag = (e) => {
+    if (!dragging) return;
     dragging = false;
-    document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', endDrag);
-    document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('touchend', endDrag);
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', endDrag);
     if (chrome.storage && chrome.storage.local) {
       const left = parseInt(el.style.left, 10);
       const top = parseInt(el.style.top, 10);
       chrome.storage.local.set({ mapsFilterPosition: { left, top } });
     }
+    if (moved) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   };
 
-  el.addEventListener('mousedown', startDrag);
-  el.addEventListener('touchstart', startDrag, { passive: true });
+  el.addEventListener('pointerdown', startDrag);
 }
 
 function parseSearchInput(input) {
