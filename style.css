@@ -9,6 +9,7 @@
   padding: 12px;
   border: 1px solid #e0e0e0;
   transition: width 0.3s ease, height 0.3s ease, padding 0.3s ease;
+  user-select: none; /* Prevent text selection during drag */
 }
 
 .input-wrapper {
@@ -199,4 +200,116 @@
 
 #maps-list-filter.collapsed .collapse-button {
   display: none;
+}
+
+/* Drag handle area */
+.filter-drag-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  cursor: move;
+  background: transparent;
+  border-radius: 8px 8px 0 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-drag-handle:hover {
+  background: rgba(66, 133, 244, 0.08);
+}
+
+.filter-drag-handle::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 4px;
+  background: repeating-linear-gradient(
+    to right,
+    #9aa0a6 0px,
+    #9aa0a6 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.filter-drag-handle:hover::before {
+  background: repeating-linear-gradient(
+    to right,
+    #4285f4 0px,
+    #4285f4 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  width: 24px;
+}
+
+/* Dragging state */
+#maps-list-filter.dragging {
+  transition: none !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  transform: rotate(2deg);
+  opacity: 0.95;
+  cursor: move;
+}
+
+#maps-list-filter.dragging * {
+  pointer-events: none;
+}
+
+/* Collapsed state drag handle */
+#maps-list-filter.collapsed .filter-drag-handle {
+  /* Create a ring around the toggle button, not covering it */
+  right: 0;
+  height: 48px;
+  border-radius: 50%;
+  /* Use a border to create draggable area without blocking the center */
+  background: transparent;
+  border: 8px solid transparent;
+  box-sizing: border-box;
+  /* Ensure toggle button is accessible */
+  pointer-events: none;
+}
+
+#maps-list-filter.collapsed .filter-drag-handle:hover {
+  background: rgba(66, 133, 244, 0.1);
+  border-color: rgba(66, 133, 244, 0.2);
+}
+
+/* Create draggable edges for collapsed state */
+#maps-list-filter.collapsed .filter-drag-handle::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: move;
+}
+
+#maps-list-filter.collapsed .filter-drag-handle::after {
+  content: "↔";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #9aa0a6;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#maps-list-filter.collapsed .filter-drag-handle:hover::after {
+  opacity: 1;
 }

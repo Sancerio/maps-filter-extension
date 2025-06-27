@@ -112,6 +112,7 @@ function injectFilterUI() {
   const container = document.createElement('div');
   container.id = 'maps-list-filter';
   container.innerHTML = `
+    <div class="filter-drag-handle" aria-label="Drag to move filter"></div>
     <div class="filter-content">
       <div class="input-wrapper" style="position:relative;">
         <input type="text" id="maps-filter-input" placeholder="Filter places by name, type, price, or notes..." />
@@ -154,9 +155,17 @@ function injectFilterUI() {
   document.body.appendChild(container);
 
   // Restore last state from chrome.storage.local
-  chrome.storage && chrome.storage.local.get(['mapsFilterCollapsed'], (result) => {
+  chrome.storage && chrome.storage.local.get(['mapsFilterCollapsed', 'mapsFilterPosition'], (result) => {
     if (result.mapsFilterCollapsed === true) {
       container.classList.add('collapsed');
+    }
+    
+    // Restore saved position
+    if (result.mapsFilterPosition) {
+      const { top, left } = result.mapsFilterPosition;
+      container.style.top = top + 'px';
+      container.style.left = left + 'px';
+      container.style.right = 'auto'; // Override CSS right positioning
     }
   });
 
@@ -199,6 +208,121 @@ function injectFilterUI() {
 
   document.getElementById('collapse-filter').addEventListener('click', collapseFilterUI);
   document.getElementById('maps-filter-toggle').addEventListener('click', expandFilterUI);
+  
+  // Add drag functionality
+  initializeDragFunctionality(container);
+}
+
+function initializeDragFunctionality(container) {
+  const dragHandle = container.querySelector('.filter-drag-handle');
+  let isDragging = false;
+  let startX, startY, startLeft, startTop;
+
+  function handleMouseDown(e) {
+    // Prevent default to avoid text selection
+    e.preventDefault();
+    
+    isDragging = true;
+    container.classList.add('dragging');
+    
+    // Get current position
+    const rect = container.getBoundingClientRect();
+    startLeft = rect.left;
+    startTop = rect.top;
+    startX = e.clientX;
+    startY = e.clientY;
+
+    // Add global event listeners
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    // Disable text selection and transitions
+    document.body.style.userSelect = 'none';
+  }
+
+  function handleMouseMove(e) {
+    if (!isDragging) return;
+
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    
+    let newLeft = startLeft + deltaX;
+    let newTop = startTop + deltaY;
+    
+    // Keep within viewport bounds
+    const containerRect = container.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    newLeft = Math.max(0, Math.min(newLeft, viewportWidth - containerRect.width));
+    newTop = Math.max(0, Math.min(newTop, viewportHeight - containerRect.height));
+    
+    // Update position
+    container.style.left = newLeft + 'px';
+    container.style.top = newTop + 'px';
+    container.style.right = 'auto'; // Override CSS right positioning
+  }
+
+  function handleMouseUp() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    container.classList.remove('dragging');
+    
+    // Remove global event listeners
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+    
+    // Re-enable text selection
+    document.body.style.userSelect = '';
+    
+    // Save the new position
+    const rect = container.getBoundingClientRect();
+    if (chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({
+        mapsFilterPosition: {
+          top: rect.top,
+          left: rect.left
+        }
+      });
+    }
+  }
+
+  // Add touch support for mobile devices
+  function handleTouchStart(e) {
+    if (e.touches.length !== 1) return;
+    
+    const touch = e.touches[0];
+    // Convert touch event to mouse event structure
+    const mouseEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      preventDefault: () => e.preventDefault()
+    };
+    handleMouseDown(mouseEvent);
+  }
+
+  function handleTouchMove(e) {
+    if (!isDragging || e.touches.length !== 1) return;
+    
+    const touch = e.touches[0];
+    const mouseEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    };
+    handleMouseMove(mouseEvent);
+    e.preventDefault(); // Prevent scrolling while dragging
+  }
+
+  function handleTouchEnd() {
+    handleMouseUp();
+  }
+
+  // Attach event listeners
+  dragHandle.addEventListener('mousedown', handleMouseDown);
+  dragHandle.addEventListener('touchstart', handleTouchStart, { passive: false });
+  document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  document.addEventListener('touchend', handleTouchEnd);
 }
 
 function collapseFilterUI() {
