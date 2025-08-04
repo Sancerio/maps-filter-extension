@@ -256,13 +256,21 @@
 #maps-list-filter.dragging {
   transition: none !important;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-  transform: rotate(2deg);
   opacity: 0.95;
   cursor: move;
+  will-change: transform;
+  z-index: 10000;
 }
 
 #maps-list-filter.dragging * {
   pointer-events: none;
+}
+
+/* Performance optimizations */
+#maps-list-filter {
+  will-change: transform;
+  contain: layout;
+  transform-origin: center center;
 }
 
 /* Collapsed state drag handle */
