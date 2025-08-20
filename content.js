@@ -1,6 +1,9 @@
 let lastQuery = '';
 let lastExcludeQuery = [];
 
+// Cache for compiled regex patterns to improve performance
+const regexCache = new Map();
+
 function removeDiacritics(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
@@ -119,10 +122,21 @@ function fuzzyMatch(query, text) {
   const normalizedQuery = removeDiacritics(query.toLowerCase().replace(/\s+/g, ''));
   const normalizedText = removeDiacritics(text.toLowerCase());
 
-  const escaped = normalizedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const pattern = escaped.split('').join('.*');
-  const regex = new RegExp(pattern);
-  return regex.test(normalizedText);
+  // Check cache first for performance optimization
+  if (!regexCache.has(normalizedQuery)) {
+    const escaped = normalizedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = escaped.split('').join('.*');
+    regexCache.set(normalizedQuery, new RegExp(pattern));
+    
+    // Prevent cache from growing too large
+    if (regexCache.size > 100) {
+      // Remove oldest entries (first inserted)
+      const firstKey = regexCache.keys().next().value;
+      regexCache.delete(firstKey);
+    }
+  }
+  
+  return regexCache.get(normalizedQuery).test(normalizedText);
 }
 
 function filterPlaces(query, excludeQuery = []) {

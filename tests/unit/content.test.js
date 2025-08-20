@@ -129,6 +129,80 @@ describe('Content Script Unit Tests', () => {
     test('should not match when characters are not in order', () => {
       expect(fuzzyMatch('cfesmu', 'Coffee Supreme')).toBe(false);
     });
+
+    test('should handle single character queries', () => {
+      expect(fuzzyMatch('c', 'Coffee')).toBe(true);
+      expect(fuzzyMatch('f', 'Coffee')).toBe(true);
+      expect(fuzzyMatch('x', 'Coffee')).toBe(false);
+    });
+
+    test('should handle empty queries', () => {
+      expect(fuzzyMatch('', 'Coffee Supreme')).toBe(true);
+      expect(fuzzyMatch('', '')).toBe(true);
+    });
+
+    test('should handle very long queries', () => {
+      const longQuery = 'coffeesupremedeluxespecialtyroasters';
+      expect(fuzzyMatch(longQuery, 'Coffee Supreme Deluxe Specialty Roasters')).toBe(true);
+      expect(fuzzyMatch(longQuery, 'Short text')).toBe(false);
+    });
+
+    test('should handle special characters in queries', () => {
+      expect(fuzzyMatch('c&f', 'Coffee & Food')).toBe(true);
+      expect(fuzzyMatch('$10', '$10-20 range')).toBe(true);
+      expect(fuzzyMatch('3.5*', '3.5 star rating')).toBe(true);
+      expect(fuzzyMatch('50%', '50% off sale')).toBe(true);
+    });
+
+    test('should handle mixed case correctly', () => {
+      expect(fuzzyMatch('CfE', 'Coffee')).toBe(true);
+      expect(fuzzyMatch('cFe', 'COFFEE')).toBe(true);
+      expect(fuzzyMatch('CoFfEe', 'coffee supreme')).toBe(true);
+    });
+
+    test('should handle diacritics in both query and text', () => {
+      expect(fuzzyMatch('cafe', 'Café')).toBe(true);
+      expect(fuzzyMatch('café', 'Cafe')).toBe(true);
+      expect(fuzzyMatch('naï', 'Naïve Restaurant')).toBe(true);
+      expect(fuzzyMatch('patiss', 'Pâtisserie')).toBe(true);
+    });
+
+    test('should handle whitespace in queries', () => {
+      expect(fuzzyMatch('cof fee', 'Coffee Supreme')).toBe(true); // Spaces should be removed
+      expect(fuzzyMatch('  cfe  ', 'Coffee')).toBe(true); // Leading/trailing spaces
+      expect(fuzzyMatch('c f e', 'Coffee')).toBe(true); // Multiple spaces
+    });
+
+    test('should handle regex special characters correctly', () => {
+      expect(fuzzyMatch('a.b', 'Apple.Banana')).toBe(true);
+      expect(fuzzyMatch('a*b', 'Apple*Banana')).toBe(true);
+      expect(fuzzyMatch('a+b', 'Apple+Banana')).toBe(true);
+      expect(fuzzyMatch('a?b', 'Apple?Banana')).toBe(true);
+      expect(fuzzyMatch('a^b', 'Apple^Banana')).toBe(true);
+      expect(fuzzyMatch('a$b', 'Apple$Banana')).toBe(true);
+      expect(fuzzyMatch('a{b}', 'Apple{Banana}')).toBe(true);
+      expect(fuzzyMatch('a[b]', 'Apple[Banana]')).toBe(true);
+      expect(fuzzyMatch('a(b)', 'Apple(Banana)')).toBe(true);
+      expect(fuzzyMatch('a|b', 'Apple|Banana')).toBe(true);
+      expect(fuzzyMatch('a\\b', 'Apple\\Banana')).toBe(true);
+    });
+
+    test('should not match when essential characters are missing', () => {
+      expect(fuzzyMatch('xyz', 'Coffee Supreme')).toBe(false);
+      expect(fuzzyMatch('qwerty', 'Coffee')).toBe(false);
+      expect(fuzzyMatch('abc', 'def')).toBe(false);
+    });
+
+    test('should handle edge case with query longer than text', () => {
+      expect(fuzzyMatch('verylongquery', 'short')).toBe(false);
+      expect(fuzzyMatch('coffee', 'cfe')).toBe(false);
+    });
+
+    test('should handle unicode characters', () => {
+      expect(fuzzyMatch('🍕', '🍕 Pizza Place')).toBe(true);
+      expect(fuzzyMatch('中文', '中文餐厅')).toBe(true);
+      expect(fuzzyMatch('αβγ', 'αβγδε')).toBe(true);
+    });
   });
 
   describe('getScrollableListContainer', () => {
