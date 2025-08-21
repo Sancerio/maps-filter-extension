@@ -9,18 +9,38 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     container:
-      image: node:18-bullseye-slim
+      image: node:18-bullseye
     steps:
       - uses: actions/checkout@v3
-      - run: apt-get update && apt-get install -y zip
       - run: npm ci
       - run: npm test
       - run: ./scripts/pack.sh
       - name: Get version
         id: version
         run: echo "version=$(node -p \"require('./manifest.json').version\")" >> "$GITHUB_OUTPUT"
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: extension-package
+          path: google-maps-list-filter-v${{ steps.version.outputs.version }}.zip
+      - name: Verify version format
+        run: |
+          if [[ ! "${{ steps.version.outputs.version }}" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "Invalid version format: ${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+      - name: Check tag matches manifest version
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          MANIFEST_VERSION="${{ steps.version.outputs.version }}"
+          if [[ "$TAG_VERSION" != "$MANIFEST_VERSION" ]]; then
+            echo "Tag version ($TAG_VERSION) doesn't match manifest version ($MANIFEST_VERSION)"
+            exit 1
+          fi
       - name: Upload to Chrome Web Store
+        id: chrome
         uses: google-github-actions/upload-chrome-extension@v0
+        continue-on-error: true
         with:
           extension_id: ${{ secrets.CHROME_EXTENSION_ID }}
           zip_file: google-maps-list-filter-v${{ steps.version.outputs.version }}.zip
@@ -29,6 +49,8 @@ jobs:
           refresh_token: ${{ secrets.CHROME_REFRESH_TOKEN }}
           publish: true
       - name: Upload to Firefox Add-ons
+        id: firefox
+        continue-on-error: true
         run: |
           npm install -g web-ext
           web-ext sign \
@@ -36,3 +58,6 @@ jobs:
             --api-key ${{ secrets.FIREFOX_JWT_ISSUER }} \
             --api-secret ${{ secrets.FIREFOX_JWT_SECRET }} \
             --channel listed
+      - name: Fail if any upload failed
+        if: ${{ steps.chrome.outcome == 'failure' || steps.firefox.outcome == 'failure' }}
+        run: exit 1

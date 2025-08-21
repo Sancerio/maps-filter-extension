@@ -135,9 +135,9 @@ This creates a `google-maps-list-filter-v1.0.zip` file ready for store submissio
 
 ## 🚀 Continuous Deployment
 
-The GitHub Actions workflow (`.github/workflows/publish.yml`) uses a lightweight
-`node:18-bullseye-slim` container to automatically package and publish new
-versions to the Chrome Web Store and Firefox Add-ons whenever a version tag is
+  The GitHub Actions workflow (`.github/workflows/publish.yml`) uses a
+  `node:18-bullseye` container with `zip` pre-installed to automatically package
+  and publish new versions to the Chrome Web Store and Firefox Add-ons whenever a version tag is
 pushed. To enable it, create API credentials
 for both stores and add the following secrets in your repository settings:
 
@@ -148,8 +148,9 @@ for both stores and add the following secrets in your repository settings:
 - `FIREFOX_JWT_ISSUER`
 - `FIREFOX_JWT_SECRET`
 
-Push a tag such as `v1.1` to trigger the workflow. See
-[docs/ci-publishing.md](docs/ci-publishing.md) for more details.
+  Push a tag such as `v1.1` to trigger the workflow. Tags should follow semantic
+  versioning (e.g., `v1.2.0`) to ensure the workflow succeeds. See
+  [docs/ci-publishing.md](docs/ci-publishing.md) for more details.
 
 ## 🧪 Testing
 

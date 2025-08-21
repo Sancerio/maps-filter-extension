@@ -16,11 +16,14 @@ This document outlines how to automatically publish the extension to the Chrome 
 
 ## Firefox Add-ons
 
-1. Register for a Firefox Add-ons developer account.
+1. Register for a Firefox Add-ons developer account at <https://addons.mozilla.org/developers/>.
 2. Generate JWT credentials from <https://addons.mozilla.org/developers/addon/api/key/>.
 3. Add the following secrets to the repository:
-   - `FIREFOX_JWT_ISSUER`
-   - `FIREFOX_JWT_SECRET`
+    - `FIREFOX_JWT_ISSUER`
+    - `FIREFOX_JWT_SECRET`
+
+> **Security tip:** Keep these JWT credentials secure and rotate them periodically.
+
 4. `web-ext sign` is used to sign and upload the build to AMO.
 
 ## GitHub Actions workflow
@@ -33,7 +36,7 @@ The file `.github/workflows/publish.yml` provides a reference workflow. It is tr
 4. Uploads the package to the Chrome Web Store.
 5. Signs and uploads the package to Firefox Add-ons.
 
-The job runs inside the lightweight `node:18-bullseye-slim` container to speed
-up setup and keep resource usage low.
+The job runs inside the `node:18-bullseye` container, which includes `zip` to
+speed up setup and keep resource usage low.
 
 Customize the workflow if additional steps are required for your project.
