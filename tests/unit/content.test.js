@@ -150,7 +150,7 @@ describe('Content Script Unit Tests', () => {
     test('should handle special characters in queries', () => {
       expect(fuzzyMatch('c&f', 'Coffee & Food')).toBe(true);
       expect(fuzzyMatch('$10', '$10-20 range')).toBe(true);
-      expect(fuzzyMatch('3.5*', '3.5 star rating')).toBe(true);
+      expect(fuzzyMatch('3.5*', '3.5* star rating')).toBe(true);
       expect(fuzzyMatch('50%', '50% off sale')).toBe(true);
     });
 

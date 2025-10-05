@@ -124,10 +124,13 @@ function fuzzyMatch(query, text) {
 
   // Check cache first for performance optimization
   if (!regexCache.has(normalizedQuery)) {
-    const escaped = normalizedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const pattern = escaped.split('').join('.*');
+    const pattern = normalizedQuery
+      .split('')
+      .map((char) => char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('.*');
+
     regexCache.set(normalizedQuery, new RegExp(pattern));
-    
+
     // Prevent cache from growing too large
     if (regexCache.size > 100) {
       // Remove oldest entries (first inserted)
