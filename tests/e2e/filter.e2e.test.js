@@ -58,9 +58,9 @@ describe('Google Maps List Filter E2E Tests', () => {
 
   test('should show all items when filter is empty', async () => {
     await new Promise(resolve => setTimeout(resolve, 500)); 
-    const item1 = await page.$('#item1');
-    const item2 = await page.$('#item2');
-    const item3 = await page.$('#item3');
+    const item1 = await page.$('#item1_wrapper');
+    const item2 = await page.$('#item2_wrapper');
+    const item3 = await page.$('#item3_wrapper');
     expect(await page.evaluate(el => el.style.display, item1)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item3)).not.toBe('none');
@@ -69,8 +69,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should filter items by name', async () => {
     await page.type('#maps-filter-input', 'Coffee Supreme');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item1 = await page.$('#item1');
-    const item2 = await page.$('#item2');
+    const item1 = await page.$('#item1_wrapper');
+    const item2 = await page.$('#item2_wrapper');
     expect(await page.evaluate(el => el.style.display, item1)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item2)).toBe('none');
   });
@@ -78,8 +78,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should filter items by details/type (e.g., Bookstore)', async () => {
     await page.type('#maps-filter-input', 'Bookstore');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item1 = await page.$('#item1');
-    const item2 = await page.$('#item2');
+    const item1 = await page.$('#item1_wrapper');
+    const item2 = await page.$('#item2_wrapper');
     expect(await page.evaluate(el => el.style.display, item1)).toBe('none');
     expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none');
   });
@@ -87,8 +87,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should filter items by note content', async () => {
     await page.type('#maps-filter-input', 'cold brew');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item1 = await page.$('#item1');
-    const item2 = await page.$('#item2');
+    const item1 = await page.$('#item1_wrapper');
+    const item2 = await page.$('#item2_wrapper');
     expect(await page.evaluate(el => el.style.display, item1)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item2)).toBe('none');
   });
@@ -96,8 +96,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should filter with diacritics (querying for Pâtisserie)', async () => {
     await page.type('#maps-filter-input', 'Pâtisserie');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item4 = await page.$('#item4');
-    const item1 = await page.$('#item1');
+    const item4 = await page.$('#item4_wrapper');
+    const item1 = await page.$('#item1_wrapper');
     expect(await page.evaluate(el => el.style.display, item4)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item1)).toBe('none');
   });
@@ -105,8 +105,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should filter with diacritics (querying for delices from note)', async () => {
     await page.type('#maps-filter-input', 'delices');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item4 = await page.$('#item4');
-    const item1 = await page.$('#item1');
+    const item4 = await page.$('#item4_wrapper');
+    const item1 = await page.$('#item1_wrapper');
     expect(await page.evaluate(el => el.style.display, item4)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item1)).toBe('none');
   });
@@ -119,8 +119,8 @@ describe('Google Maps List Filter E2E Tests', () => {
     await page.keyboard.press('Space'); 
     await page.keyboard.press('Backspace');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item1 = await page.$('#item1');
-    const item2 = await page.$('#item2');
+    const item1 = await page.$('#item1_wrapper');
+    const item2 = await page.$('#item2_wrapper');
     expect(await page.evaluate(el => el.style.display, item1)).not.toBe('none');
     expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none');
   });
@@ -128,8 +128,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should exclude items using minus syntax', async () => {
     await page.type('#maps-filter-input', '-Coffee');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item1 = await page.$('#item1'); // Coffee Supreme
-    const item2 = await page.$('#item2'); // Page Turner Bookstore
+    const item1 = await page.$('#item1_wrapper'); // Coffee Supreme
+    const item2 = await page.$('#item2_wrapper'); // Page Turner Bookstore
     expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (contains Coffee)
     expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none'); // Should be visible (no Coffee)
   });
@@ -137,8 +137,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should apply both include and exclude filters', async () => {
     await page.type('#maps-filter-input', 'Bookstore -used');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item2 = await page.$('#item2'); // Page Turner Bookstore
-    const item1 = await page.$('#item1'); // Coffee Supreme
+    const item2 = await page.$('#item2_wrapper'); // Page Turner Bookstore
+    const item1 = await page.$('#item1_wrapper'); // Coffee Supreme
     expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none'); // Should be visible (has Bookstore, no 'used')
     expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (no Bookstore)
   });
@@ -146,8 +146,8 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should exclude by note content', async () => {
     await page.type('#maps-filter-input', '-brew');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item1 = await page.$('#item1'); // Has 'cold brew' in note
-    const item2 = await page.$('#item2'); // No 'brew' in note
+    const item1 = await page.$('#item1_wrapper'); // Has 'cold brew' in note
+    const item2 = await page.$('#item2_wrapper'); // No 'brew' in note
     expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (note contains 'brew')
     expect(await page.evaluate(el => el.style.display, item2)).not.toBe('none'); // Should be visible (no 'brew' in note)
   });
@@ -155,9 +155,9 @@ describe('Google Maps List Filter E2E Tests', () => {
   test('should handle multiple exclude terms', async () => {
     await page.type('#maps-filter-input', '-Coffee -Bookstore');
     await new Promise(resolve => setTimeout(resolve, 300));
-    const item1 = await page.$('#item1'); // Coffee Supreme (contains "Coffee")
-    const item2 = await page.$('#item2'); // Best Books with "Bookstore" in details
-    const item3 = await page.$('#item3'); // Central Park (should be visible)
+    const item1 = await page.$('#item1_wrapper'); // Coffee Supreme (contains "Coffee")
+    const item2 = await page.$('#item2_wrapper'); // Best Books with "Bookstore" in details
+    const item3 = await page.$('#item3_wrapper'); // Central Park (should be visible)
     
     expect(await page.evaluate(el => el.style.display, item1)).toBe('none'); // Should be hidden (contains Coffee)
     expect(await page.evaluate(el => el.style.display, item2)).toBe('none'); // Should be hidden (contains Bookstore)
@@ -166,6 +166,27 @@ describe('Google Maps List Filter E2E Tests', () => {
     }
   });
 
+  test('should keep a note-matched saved-list row visible and clickable', async () => {
+    await page.type('#maps-filter-input', 'springfield');
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const matchingRow = await page.$('#item6_wrapper');
+    const matchingCard = await page.$('#item6');
+    const matchingMeta = await page.$('#item6_meta');
+    const nonMatchingRow = await page.$('#item7_wrapper');
+
+    expect(await page.evaluate(el => el.style.display, matchingRow)).not.toBe('none');
+    expect(await page.evaluate(el => el.style.display, matchingCard)).not.toBe('none');
+    expect(await page.evaluate(el => el.style.display, matchingMeta)).not.toBe('none');
+    expect(await page.evaluate(el => el.style.display, nonMatchingRow)).toBe('none');
+
+    await page.evaluate(() => {
+      document.getElementById('item6_button').click();
+    });
+    const clicks = await page.evaluate(() => window.__mapsFixtureClicks || []);
+    expect(clicks).toContain('item6');
+  });
+
   // TODO: Add tests for observing list changes (dynamically add item and check filter)
   // TODO: Add tests for auto-scroll (might be hard with static fixture, may need to mock scrollHeight/clientHeight via page.evaluate)
-}); 
+});

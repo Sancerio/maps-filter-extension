@@ -84,6 +84,40 @@
             </div>
         </div>
 
+        <!-- Item 6 (realistic saved-list row shape: place card + separate metadata panel) -->
+        <div class="list-item-container" id="item6_wrapper">
+            <div class="place-card-shell">
+                <div class="place-card" id="item6">
+                    <button id="item6_button" onclick="window.__mapsFixtureClicks = window.__mapsFixtureClicks || []; window.__mapsFixtureClicks.push('item6');">
+                        <img src="fake_img.png" alt="Place image">
+                        <span class="fontHeadlineSmall">First Friday Art Walk</span>
+                        <span class="details">Arts · Monthly Event</span>
+                    </button>
+                </div>
+            </div>
+            <div class="metadata-panel" id="item6_meta">
+                <div class="item-note">Springfield, IL</div>
+                <button type="button" id="item6_delete">Delete</button>
+            </div>
+        </div>
+
+        <!-- Item 7 (same shape, non-matching note) -->
+        <div class="list-item-container" id="item7_wrapper">
+            <div class="place-card-shell">
+                <div class="place-card" id="item7">
+                    <button id="item7_button" onclick="window.__mapsFixtureClicks = window.__mapsFixtureClicks || []; window.__mapsFixtureClicks.push('item7');">
+                        <img src="fake_img.png" alt="Place image">
+                        <span class="fontHeadlineSmall">Second Friday Art Walk</span>
+                        <span class="details">Arts · Monthly Event</span>
+                    </button>
+                </div>
+            </div>
+            <div class="metadata-panel" id="item7_meta">
+                <div class="item-note">Boston, MA</div>
+                <button type="button" id="item7_delete">Delete</button>
+            </div>
+        </div>
+
         <!-- Add more items to test scrolling if possible, though true dynamic loading is hard here -->
         <!-- For now, these 5 items should be enough for basic E2E filtering tests -->
     </div>

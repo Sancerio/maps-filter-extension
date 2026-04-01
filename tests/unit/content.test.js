@@ -397,10 +397,57 @@ describe('Content Script Unit Tests', () => {
       listContainer.appendChild(wrapper);
 
       filterPlaces('nested');
-      expect(itemDiv.style.display).toBe('');
+      expect(wrapper.style.display).toBe('');
       
       filterPlaces('nonexistent');
-      expect(itemDiv.style.display).toBe('none');
+      expect(wrapper.style.display).toBe('none');
+      expect(itemDiv.style.display).toBe('');
+    });
+
+    test('should keep the full row visible when a nested note matches', () => {
+      listContainer.innerHTML = '';
+
+      const matchingRow = document.createElement('div');
+      matchingRow.id = 'matching-row';
+      const matchingContent = document.createElement('div');
+      matchingContent.id = 'matching-content';
+      const matchingButton = createPlaceItem('btn1', 'First Friday Art Walk', 'Arts', '').querySelector('button');
+      matchingContent.appendChild(matchingButton);
+      matchingRow.appendChild(matchingContent);
+
+      const matchingMeta = document.createElement('div');
+      matchingMeta.className = 'metadata-panel';
+      const matchingNote = document.createElement('div');
+      matchingNote.className = 'item-note';
+      matchingNote.textContent = 'Springfield, IL';
+      matchingMeta.appendChild(matchingNote);
+      const matchingDelete = document.createElement('button');
+      matchingDelete.textContent = 'Delete';
+      matchingMeta.appendChild(matchingDelete);
+      matchingRow.appendChild(matchingMeta);
+      listContainer.appendChild(matchingRow);
+
+      const nonMatchingRow = document.createElement('div');
+      nonMatchingRow.id = 'non-matching-row';
+      const nonMatchingContent = document.createElement('div');
+      const nonMatchingButton = createPlaceItem('btn2', 'Second Friday Art Walk', 'Arts', '').querySelector('button');
+      nonMatchingContent.appendChild(nonMatchingButton);
+      nonMatchingRow.appendChild(nonMatchingContent);
+
+      const nonMatchingMeta = document.createElement('div');
+      nonMatchingMeta.className = 'metadata-panel';
+      const nonMatchingNote = document.createElement('div');
+      nonMatchingNote.className = 'item-note';
+      nonMatchingNote.textContent = 'Boston, MA';
+      nonMatchingMeta.appendChild(nonMatchingNote);
+      nonMatchingRow.appendChild(nonMatchingMeta);
+      listContainer.appendChild(nonMatchingRow);
+
+      filterPlaces('springfield');
+
+      expect(matchingRow.style.display).toBe('');
+      expect(matchingContent.style.display).toBe('');
+      expect(nonMatchingRow.style.display).toBe('none');
     });
 
     // Add more tests for edge cases in name/typePrice extraction, various DOM structures, etc.

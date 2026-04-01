@@ -397,6 +397,60 @@ function parseSearchInput(input) {
   return { includeTerms, excludeTerms };
 }
 
+function getAncestorDiv(element) {
+  let current = element ? element.parentElement : null;
+  while (current && current.tagName !== 'DIV') {
+    current = current.parentElement;
+  }
+  return current;
+}
+
+function findPlaceItemContainer(button, listContainer, placeButtonSet) {
+  if (!button || !listContainer) return null;
+
+  let current = button.closest('div');
+  let bestMatch = current;
+
+  while (current && current !== listContainer) {
+    bestMatch = current;
+
+    const parentDiv = getAncestorDiv(current);
+    if (!parentDiv || parentDiv === listContainer) {
+      break;
+    }
+
+    const placeButtonsInParent = Array.from(parentDiv.querySelectorAll('button'))
+      .filter(candidate => placeButtonSet.has(candidate));
+
+    if (placeButtonsInParent.length !== 1) {
+      break;
+    }
+
+    current = parentDiv;
+  }
+
+  return bestMatch;
+}
+
+function getAssociatedNoteSibling(itemElement, placeButtonSet) {
+  if (!itemElement) return null;
+
+  const sibling = itemElement.nextElementSibling;
+  if (!sibling) return null;
+
+  const containsPlaceButton = Array.from(sibling.querySelectorAll('button'))
+    .some(candidate => placeButtonSet.has(candidate));
+
+  if (containsPlaceButton) return null;
+
+  const noteSelector = 'div.item-note, span.item-note, div[class*="note"], span[class*="note"], textarea';
+  if (sibling.matches(noteSelector) || sibling.querySelector(noteSelector)) {
+    return sibling;
+  }
+
+  return null;
+}
+
 function filterPlaces(query, excludeQuery = []) {
   const listContainer = document.querySelector('div[role="main"]');
   if (!listContainer) return;
@@ -409,32 +463,33 @@ function filterPlaces(query, excludeQuery = []) {
     return (hasImage && hasHeadline) || (hasHeadline && hasMultipleDivsOrSpans) || (hasImage && hasMultipleDivsOrSpans);
   });
 
+  const placeButtonSet = new Set(placeButtons);
+  const processedItems = new WeakSet();
+
   const itemsToShowOrHide = [];
   placeButtons.forEach(button => {
-    // Find the closest div ancestor that is NOT the listContainer itself
-    let itemDiv = button.closest('div');
-    while (itemDiv && (itemDiv === listContainer || !itemDiv.contains(button))) {
-      itemDiv = itemDiv.parentElement.closest('div');
-    }
+    const itemDiv = findPlaceItemContainer(button, listContainer, placeButtonSet);
     if (!itemDiv || itemDiv === listContainer) return;
+    if (processedItems.has(itemDiv)) return;
+    processedItems.add(itemDiv);
 
     let itemText = extractAllText(itemDiv);
-    const sibling = itemDiv.nextElementSibling;
-    if (
-      sibling && (
-        sibling.matches('div.item-note, span.item-note, div[class*="note"], span[class*="note"]') ||
-        sibling.querySelector('textarea')
-      )
-    ) {
+    const sibling = getAssociatedNoteSibling(itemDiv, placeButtonSet);
+    const elementsToToggle = [itemDiv];
+
+    if (sibling) {
       itemText += ' ' + extractAllText(sibling);
+      elementsToToggle.push(sibling);
     }
 
-    itemsToShowOrHide.push({ element: itemDiv, text: itemText });
+    itemsToShowOrHide.push({ element: itemDiv, elementsToToggle, text: itemText });
   });
 
   // First, make all identified items visible by default
   itemsToShowOrHide.forEach(itemData => {
-    itemData.element.style.display = ''; 
+    itemData.elementsToToggle.forEach(element => {
+      element.style.display = '';
+    });
   });
   
   // console.log(itemsToShowOrHide); // This shows the correct data
@@ -465,7 +520,9 @@ function filterPlaces(query, excludeQuery = []) {
       }
     }
 
-    itemData.element.style.display = shouldShow ? '' : 'none';
+    itemData.elementsToToggle.forEach(element => {
+      element.style.display = shouldShow ? '' : 'none';
+    });
   });
 }
 
