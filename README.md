@@ -1,5 +1,12 @@
 # Google Maps List Filter
 
+[![Chrome Web Store users](https://img.shields.io/chrome-web-store/users/cbbcmnjjnjppiblignienleehdgffhim?label=users&color=4285F4)](https://chromewebstore.google.com/detail/cbbcmnjjnjppiblignienleehdgffhim)
+[![Chrome Web Store rating](https://img.shields.io/chrome-web-store/rating/cbbcmnjjnjppiblignienleehdgffhim)](https://chromewebstore.google.com/detail/cbbcmnjjnjppiblignienleehdgffhim)
+[![Chrome Web Store version](https://img.shields.io/chrome-web-store/v/cbbcmnjjnjppiblignienleehdgffhim)](https://chromewebstore.google.com/detail/cbbcmnjjnjppiblignienleehdgffhim)
+[![License: MIT](https://img.shields.io/github/license/Sancerio/maps-filter-extension)](LICENSE)
+
+> **[Available on the Chrome Web Store →](https://chromewebstore.google.com/detail/cbbcmnjjnjppiblignienleehdgffhim)** — installed by 400+ users.
+
 A browser extension that adds a powerful search and filter functionality to your saved places in Google Maps lists. Easily find specific restaurants, hotels, or attractions by searching through names, types, prices, or your personal notes.
 
 ![Extension in Action](assets/demo.gif)
